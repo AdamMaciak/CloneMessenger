@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-<!--TODO dodac pozniej do values stringi-->
+    <!--TODO dodac pozniej do values stringi-->
     <item
         android:id="@+id/action_chats"
-        android:title="Chats"
         android:enabled="true"
-        />
+        android:icon="@drawable/ic_chat_24px"
+        android:title="Chats" />
     <item
         android:id="@+id/action_contacts"
-        android:title="Contacts"
-        android:enabled="true"/>
+        android:enabled="true"
+        android:icon="@drawable/ic_call_24px"
+        android:title="Contacts" />
     <item
         android:id="@+id/action_settings"
-        android:title="Settings"
         android:enabled="true"
-        />
+        android:icon="@drawable/ic_search_black_24dp"
+        android:title="Settings" />
 
 </menu>

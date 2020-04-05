@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         settingsFragment = new SettingsFragment();
         //  Optional<GoogleSignInAccount> account= Optional.ofNullable(GoogleSignIn.getLastSignedInAccount(getApplicationContext()));
         bottomBar = findViewById(R.id.bottomBar);
+
         bottomBar.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
