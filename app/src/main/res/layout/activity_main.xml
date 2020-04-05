@@ -8,7 +8,7 @@
 
     <FrameLayout
         android:id="@+id/fragmentContainer"
-        android:layout_width="409dp"
+        android:layout_width="match_parent"
         android:layout_height="500dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -16,15 +16,15 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomBar"
-        android:layout_width="409dp"
+        android:layout_width="match_parent"
         android:layout_height="70dp"
         android:background="@color/colorPrimary"
+        app:itemIconTint="@color/colorActionIcon"
         app:itemTextColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_bar"
-        app:itemIconTint="@color/colorActionIcon"/>
+        app:menu="@menu/bottom_bar" />
 
     <Button
         android:id="@+id/button1"

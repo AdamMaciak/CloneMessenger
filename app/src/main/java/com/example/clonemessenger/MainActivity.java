@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     ChatsFragment chatsFragment;
     SettingsFragment settingsFragment;
     BottomNavigationView bottomBar;
+    OpenChatFragment openChatFragment;
 
 
     @Override
@@ -30,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         authenticationFragment = new AuthenticationFragment();
+        openChatFragment=new OpenChatFragment();
+
         contactFragment = new ContactFragment();
         chatsFragment = new ChatsFragment();
         settingsFragment = new SettingsFragment();
@@ -59,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         toLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, authenticationFragment).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, openChatFragment).commit();
             }
         });
     }
