@@ -1,44 +1,64 @@
 package com.example.clonemessenger;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
-import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+
 
 public class MainActivity extends AppCompatActivity {
 
     Button toLogin;
-    Button secondFragmentButton;
+//    Button secondFragmentButton;
 
     AuthenticationFragment authenticationFragment;
-    FragmentManager fragmentManager;
-    SecondFragment secondFragment;
+    ContactFragment contactFragment;
+    ChatsFragment chatsFragment;
+    SettingsFragment settingsFragment;
+    BottomNavigationView bottomBar;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        toLogin = findViewById(R.id.toLogin);
-        secondFragmentButton =findViewById(R.id.button);
-        fragmentManager= getSupportFragmentManager();
-        authenticationFragment=new AuthenticationFragment();
-        secondFragment= new SecondFragment();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer,authenticationFragment).commit();
+        authenticationFragment = new AuthenticationFragment();
+        contactFragment = new ContactFragment();
+        chatsFragment = new ChatsFragment();
+        settingsFragment = new SettingsFragment();
+        //  Optional<GoogleSignInAccount> account= Optional.ofNullable(GoogleSignIn.getLastSignedInAccount(getApplicationContext()));
+        bottomBar = findViewById(R.id.bottomBar);
+        bottomBar.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_contacts:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, contactFragment).commit();
+                        return true;
+                    case R.id.action_chats:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatsFragment).commit();
+                        return true;
+                    case R.id.action_settings:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, settingsFragment).commit();
+                        return true;
+                }
+                return true;
+            }
+        });
+
+        toLogin=findViewById(R.id.button1);
+
         toLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,authenticationFragment).commit();
-            }
-        });
-        secondFragmentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,secondFragment).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, authenticationFragment).commit();
             }
         });
     }
