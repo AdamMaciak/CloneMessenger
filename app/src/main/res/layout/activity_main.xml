@@ -33,10 +33,22 @@
         android:layout_marginStart="76dp"
         android:layout_marginTop="14dp"
         android:layout_marginBottom="9dp"
-        android:text="Auth"
+        android:text="AUTH"
         app:layout_constraintBottom_toTopOf="@+id/bottomBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fragmentContainer"
         app:layout_constraintVertical_bias="0.68" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="72dp"
+        android:layout_marginBottom="41dp"
+        android:text="CHAT"
+        app:layout_constraintBottom_toTopOf="@+id/bottomBar"
+        app:layout_constraintStart_toEndOf="@+id/button1"
+        app:layout_constraintTop_toBottomOf="@+id/fragmentContainer" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

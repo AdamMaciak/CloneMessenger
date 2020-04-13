@@ -15,6 +15,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class MainActivity extends AppCompatActivity {
 
     Button toLogin;
+    Button toChat;
 //    Button secondFragmentButton;
 
     AuthenticationFragment authenticationFragment;
@@ -60,6 +61,14 @@ public class MainActivity extends AppCompatActivity {
         toLogin=findViewById(R.id.button1);
 
         toLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, authenticationFragment).commit();
+            }
+        });
+        toChat=findViewById(R.id.button2);
+
+        toChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, openChatFragment).commit();

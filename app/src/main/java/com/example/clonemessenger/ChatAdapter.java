@@ -1,6 +1,7 @@
 package com.example.clonemessenger;
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,13 +23,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     public static final int msg_right = 1;
     private Context mContext;
     private List<ChatModel> mChat;
-    private String profilePhotoUrl;
+    private Uri profilePhotoUrl;
     FirebaseUser fUser;
 
-    public ChatAdapter(Context mContext, List<ChatModel> mChat, String profilePhotoUrl) {
+    public ChatAdapter(Context mContext, List<ChatModel> mChat, Uri profilePhotoUrl) {
         this.mChat = mChat;
         this.mContext = mContext;
         this.profilePhotoUrl = profilePhotoUrl;
+        fUser= FirebaseAuth.getInstance().getCurrentUser();
     }
 
     @NonNull
@@ -46,12 +48,16 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ChatAdapter.ViewHolder holder, int position) {
         ChatModel chat=mChat.get(position);
-        Glide.with(mContext).load(profilePhotoUrl).into(holder.profile_image);
-        if(chat.getImage()!=null){
-            holder.show_image.setVisibility(View.VISIBLE);
-            Glide.with(mContext).load(chat.getImage()).into(holder.show_image);
+        //System.out.println(fUser);
+        if(!fUser.getUid().equals(chat.getSender())) {
+            Glide.with(mContext).load(profilePhotoUrl).into(holder.profile_image);
         }
-        if(chat.getMessage()!=null) {
+        if(!chat.getImage().equals("")){
+            holder.show_image.setVisibility(View.VISIBLE);
+            Glide.with(mContext).asBitmap()
+                    .fitCenter().load(chat.getImage()).into(holder.show_image);
+        }
+        if(!chat.getMessage().equals("")) {
             holder.show_message.setVisibility(View.VISIBLE);
             holder.show_message.setText(chat.getMessage());
         }
@@ -78,10 +84,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        fUser= FirebaseAuth.getInstance().getCurrentUser();
+        System.out.println(fUser.getUid());
+        System.out.println("POSITION "+position);
+        System.out.println(mChat.get(position).getSender());
         if(mChat.get(position).getSender().equals(fUser.getUid())){
+            System.out.println("-----------RIGHT");
             return msg_right;
         } else {
+            System.out.println("-------------LEFT");
             return msg_left;
         }
     }

@@ -1,16 +1,38 @@
 package com.example.clonemessenger;
 
+import java.util.Date;
+
 public class ChatModel {
     private String sender;
     private String receiver;
     private String message;
     private String image;
+    private Date timeSend;
+
+    public ChatModel(String sender, String receiver, String message, String image, Date timeSend) {
+        this.sender = sender;
+        this.receiver = receiver;
+        this.message = message;
+        this.image = image;
+        this.timeSend = timeSend;
+    }
+
+    public Date getTimeSend() {
+        return timeSend;
+    }
+
+    public void setTimeSend(Date timeSend) {
+        this.timeSend = timeSend;
+    }
 
     public ChatModel(String sender, String receiver, String message, String image) {
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
         this.image = image;
+    }
+
+    public ChatModel() {
     }
 
     public String getSender() {

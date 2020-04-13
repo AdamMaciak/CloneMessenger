@@ -117,7 +117,7 @@
                 android:src="@drawable/ic_insert_photo" />
 
             <EditText
-                android:id="@+id/editText2"
+                android:id="@+id/et_message"
                 android:layout_width="265dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -134,7 +134,7 @@
                 tools:layout_editor_absoluteY="6dp" />
 
             <ImageView
-                android:id="@+id/imageView3"
+                android:id="@+id/btn_sendMessage"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:layout_gravity="right"
