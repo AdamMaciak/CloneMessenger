@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,6 +42,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -56,13 +60,52 @@ public class OpenChatFragment extends Fragment {
     private ImageButton btn_sendMessage,btn_getFromGallery,btn_takePhoto;
     private EditText et_message;
     private FirebaseUser fUser;
-    private int GALLERY_REQUEST_CODE=1;
+    private int GALLERY_REQUEST_CODE=1,CAMERA_REQUEST_CODE=2;
     private String userId;
     FirebaseFirestore db;
     String filename;
     Uri filePath;
     boolean selected_image=false;
+    boolean take_photo=false;
     FirebaseStorage storage;
+
+    private String cameraFilePath="";
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        //This is the directory in which the file will be created. This is the default location of Camera photos
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DCIM), "Camera");
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        // Save a file: path for using again
+        cameraFilePath = "file://" + image.getAbsolutePath();
+        return image;
+    }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(!cameraFilePath.equals("")) {
+            File file = new File(cameraFilePath);
+            if (file.exists()) {
+                file.delete();
+            }
+        }
+    }
+
+    private void captureFromCamera() {
+        try {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(getContext(), BuildConfig.APPLICATION_ID + ".provider", createImageFile()));
+            startActivityForResult(intent, CAMERA_REQUEST_CODE);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -117,14 +160,18 @@ public class OpenChatFragment extends Fragment {
             @Override
             public void onClick(View v) {
                final String message=et_message.getText().toString();
-               if(!message.equals("") || selected_image==true) {
+               boolean photo=false;
+               if(take_photo==true || selected_image==true){
+                   photo=true;
+               }
+               if(!message.equals("") || photo==true) {
                    chat.clear();
                    final Date currentTime = Calendar.getInstance().getTime();
-                   if(!message.equals("") && selected_image==false) {
+                   if(!message.equals("") && photo==false) {
                        ChatModel chatModel = new ChatModel(userId, "cjvJnAr9dubyVrGZ7avyfAyaGFy1", message, "", currentTime);
                        db.collection("messages").document("Bqe17YUMVOc87njQktphxar85R63-cjvJnAr9dubyVrGZ7avyfAyaGFy1").collection("ChatModel").add(chatModel);
                        et_message.setText("");
-                   } else if(!message.equals("") && selected_image==true){
+                   } else if(!message.equals("") && photo==true){
                        StorageReference riversRef = storage.getReference().child("images/"+filename);
                        final String filename1=filename;
                        System.out.println(filePath);
@@ -140,21 +187,52 @@ public class OpenChatFragment extends Fragment {
                                System.out.println("------------------------------FILENAME"+ filename1);
                                ChatModel chatModel = new ChatModel(userId, "cjvJnAr9dubyVrGZ7avyfAyaGFy1", message, filename1, currentTime);
                                db.collection("messages").document("Bqe17YUMVOc87njQktphxar85R63-cjvJnAr9dubyVrGZ7avyfAyaGFy1").collection("ChatModel").add(chatModel);
-
-
-
+                               if(!cameraFilePath.equals("")) {
+                                   File file = new File(cameraFilePath);
+                                   if (file.exists()) {
+                                       file.delete();
+                                   }
+                               }
                            }
                        });
                        et_message.setText("");
                        filename="";
                        filePath=null;
                        selected_image=false;
+                       take_photo=false;
                        btn_takePhoto.setImageResource(R.drawable.ic_photo_camera);
                        btn_getFromGallery.setImageResource(R.drawable.ic_insert_photo);
                        btn_takePhoto.setVisibility(View.VISIBLE);
                        btn_getFromGallery.setVisibility(View.VISIBLE);
-                   } else if(message.equals("") && selected_image==true){
-
+                   } else if(message.equals("") && photo==true){
+                       StorageReference riversRef = storage.getReference().child("images/"+filename);
+                       final String filename1=filename;
+                       System.out.println(filePath);
+                       UploadTask uploadTask = riversRef.putFile(filePath);
+                       uploadTask.addOnFailureListener(new OnFailureListener() {
+                           @Override
+                           public void onFailure(@NonNull Exception exception) {
+                           }
+                       }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                           @Override
+                           public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                               Toast.makeText(getContext(),"Uploaded photo",Toast.LENGTH_SHORT);
+                               System.out.println("------------------------------FILENAME"+ filename1);
+                               ChatModel chatModel = new ChatModel(userId, "cjvJnAr9dubyVrGZ7avyfAyaGFy1", "", filename1, currentTime);
+                               db.collection("messages").document("Bqe17YUMVOc87njQktphxar85R63-cjvJnAr9dubyVrGZ7avyfAyaGFy1").collection("ChatModel").add(chatModel);
+                               if(!cameraFilePath.equals("")) {
+                                   File file = new File(cameraFilePath);
+                                   if (file.exists()) {
+                                       file.delete();
+                                   }
+                               }
+                           }
+                       });
+                       et_message.setText("");
+                       filename="";
+                       filePath=null;
+                       selected_image=false;
+                       take_photo=false;
                        btn_takePhoto.setImageResource(R.drawable.ic_photo_camera);
                        btn_getFromGallery.setImageResource(R.drawable.ic_insert_photo);
                        btn_takePhoto.setVisibility(View.VISIBLE);
@@ -167,14 +245,29 @@ public class OpenChatFragment extends Fragment {
         btn_getFromGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(Intent.ACTION_PICK);
-                // Sets the type as image/*. This ensures only components of type image are selected
-                intent.setType("image/*");
-                //We pass an extra array with the accepted mime types. This will ensure only components with these MIME types as targeted.
-                String[] mimeTypes = {"image/jpeg", "image/png"};
-                intent.putExtra(Intent.EXTRA_MIME_TYPES,mimeTypes);
-                // Launching the Intent
-                startActivityForResult(intent,GALLERY_REQUEST_CODE);
+                if (selected_image == false) {
+                    Intent intent = new Intent(Intent.ACTION_PICK);
+                    // Sets the type as image/*. This ensures only components of type image are selected
+                    intent.setType("image/*");
+                    //We pass an extra array with the accepted mime types. This will ensure only components with these MIME types as targeted.
+                    String[] mimeTypes = {"image/jpeg", "image/png"};
+                    intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+                    // Launching the Intent
+                    startActivityForResult(intent, GALLERY_REQUEST_CODE);
+                } else {
+                    selected_image=false;
+                    filename="";
+                    filePath=null;
+                    btn_getFromGallery.setImageResource(R.drawable.ic_insert_photo);
+                    btn_takePhoto.setVisibility(View.VISIBLE);
+                    btn_getFromGallery.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        btn_takePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                captureFromCamera();
             }
         });
 
@@ -192,6 +285,12 @@ public class OpenChatFragment extends Fragment {
                 btn_getFromGallery.setImageResource(R.drawable.ic_cancel);
                 btn_takePhoto.setVisibility(View.INVISIBLE);
                 selected_image=true;
+            } else if(requestCode==CAMERA_REQUEST_CODE){
+                btn_takePhoto.setImageResource(R.drawable.ic_cancel);
+                btn_getFromGallery.setVisibility(View.INVISIBLE);
+                filePath=Uri.fromFile(new File(getRealPathFromURI(Uri.parse(cameraFilePath))));
+                filename=filePath.getLastPathSegment();
+                take_photo=true;
             }
         }
     }
