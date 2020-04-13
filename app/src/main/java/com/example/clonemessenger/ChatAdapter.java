@@ -12,8 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +28,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     private List<ChatModel> mChat;
     private Uri profilePhotoUrl;
     FirebaseUser fUser;
+    FirebaseStorage storage= FirebaseStorage.getInstance();
 
     public ChatAdapter(Context mContext, List<ChatModel> mChat, Uri profilePhotoUrl) {
         this.mChat = mChat;
@@ -46,16 +50,26 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ChatAdapter.ViewHolder holder, int position) {
-        ChatModel chat=mChat.get(position);
+    public void onBindViewHolder(@NonNull final ChatAdapter.ViewHolder holder, int position) {
+        final ChatModel chat=mChat.get(position);
         //System.out.println(fUser);
         if(!fUser.getUid().equals(chat.getSender())) {
             Glide.with(mContext).load(profilePhotoUrl).into(holder.profile_image);
         }
         if(!chat.getImage().equals("")){
             holder.show_image.setVisibility(View.VISIBLE);
-            Glide.with(mContext).asBitmap()
-                    .fitCenter().load(chat.getImage()).into(holder.show_image);
+            storage.getReference().child("images/"+chat.getImage()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    Glide.with(mContext).asBitmap()
+                            .fitCenter().load(uri).into(holder.show_image);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                }
+            });
         }
         if(!chat.getMessage().equals("")) {
             holder.show_message.setVisibility(View.VISIBLE);
