@@ -9,7 +9,8 @@ import android.view.View;
 import android.widget.Button;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -24,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
     SettingsFragment settingsFragment;
     BottomNavigationView bottomBar;
     OpenChatFragment openChatFragment;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
