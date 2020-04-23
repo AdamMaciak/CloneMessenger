@@ -2,7 +2,12 @@ package com.example.clonemessenger;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
         settingsFragment = new SettingsFragment();
         //  Optional<GoogleSignInAccount> account= Optional.ofNullable(GoogleSignIn.getLastSignedInAccount(getApplicationContext()));
         bottomBar = findViewById(R.id.bottomBar);
-
         bottomBar.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -75,6 +79,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 
 }
