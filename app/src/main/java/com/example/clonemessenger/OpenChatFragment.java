@@ -18,6 +18,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
@@ -53,6 +54,8 @@ import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class OpenChatFragment extends Fragment {
 
+
+    ChatsFragment chatsFragment;
     ChatAdapter chatAdapter;
     List<ChatModel> chat=new ArrayList<>();
     RecyclerView recyclerView;
@@ -113,21 +116,32 @@ public class OpenChatFragment extends Fragment {
         // Inflate the layout for this fragment
         chat.clear();
         View root = inflater.inflate(R.layout.fragment_open_chat, container, false);
-        recyclerView=(RecyclerView) root.findViewById(R.id.rvChat);
+        recyclerView= root.findViewById(R.id.rvChat);
         recyclerView.setHasFixedSize(true);
         final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
         System.out.println(account.getPhotoUrl());
         LinearLayoutManager linearLayoutManager= new LinearLayoutManager(getContext());
         linearLayoutManager.setStackFromEnd(true);
+
+        chatsFragment= new ChatsFragment();
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatsFragment).commit();
+                //TODO temporary solution
+                MainActivity.getBottomBar().setVisibility(View.VISIBLE);
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+
         recyclerView.setLayoutManager(linearLayoutManager);
-        btn_sendMessage= (ImageButton) root.findViewById(R.id.btn_sendMessage);
-        btn_getFromGallery= (ImageButton) root.findViewById(R.id.btn_getFromGallery);
-        btn_takePhoto= (ImageButton) root.findViewById(R.id.btn_takePhoto);
-        et_message=(EditText) root.findViewById(R.id.et_message);
+        btn_sendMessage= root.findViewById(R.id.btn_sendMessage);
+        btn_getFromGallery= root.findViewById(R.id.btn_getFromGallery);
+        btn_takePhoto= root.findViewById(R.id.btn_takePhoto);
+        et_message= root.findViewById(R.id.et_message);
         fUser= FirebaseAuth.getInstance().getCurrentUser();
         userId=fUser.getUid();
         storage = FirebaseStorage.getInstance();
-
         db = FirebaseFirestore.getInstance();
         db.collection("messages")
                 .document("Bqe17YUMVOc87njQktphxar85R63-cjvJnAr9dubyVrGZ7avyfAyaGFy1").collection("ChatModel")

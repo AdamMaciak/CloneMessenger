@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     ContactFragment contactFragment;
     ChatsFragment chatsFragment;
     SettingsFragment settingsFragment;
-    BottomNavigationView bottomBar;
+    static public BottomNavigationView bottomBar;
     OpenChatFragment openChatFragment;
 
     @Override
@@ -80,4 +80,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    static public BottomNavigationView getBottomBar() {
+        return bottomBar;
+    }
 }
