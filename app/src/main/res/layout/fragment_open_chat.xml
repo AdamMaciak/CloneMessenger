@@ -75,7 +75,7 @@
 
         android:id="@+id/toolbar2"
         android:layout_width="match_parent"
-        android:layout_height="43dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
@@ -87,7 +87,7 @@
         android:contentInsetLeft="0dp"
         android:contentInsetEnd="0dp"
         android:contentInsetRight="0dp"
-        android:minHeight="?attr/actionBarSize"
+        android:minHeight="45dp"
         android:theme="?attr/actionBarTheme"
         app:contentInsetEnd="0dp"
         app:contentInsetLeft="0dp"
@@ -120,11 +120,10 @@
 
             <EditText
                 android:id="@+id/et_message"
-                android:layout_width="265dp"
+                android:layout_width="271dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginVertical="5dp"
-                android:layout_marginRight="5dp"
                 android:background="@drawable/rounded_edit_text"
                 android:ems="10"
                 android:gravity="start|top"
