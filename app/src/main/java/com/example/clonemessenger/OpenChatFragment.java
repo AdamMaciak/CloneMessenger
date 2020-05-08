@@ -6,16 +6,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -26,6 +23,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.clonemessenger.Models.ChatModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -35,7 +33,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -57,27 +54,29 @@ public class OpenChatFragment extends Fragment {
 
     ChatsFragment chatsFragment;
     ChatAdapter chatAdapter;
-    List<ChatModel> chat=new ArrayList<>();
+    List<ChatModel> chat = new ArrayList<>();
     RecyclerView recyclerView;
     private ChatAdapter mAdapter;
-    private ImageButton btn_sendMessage,btn_getFromGallery,btn_takePhoto;
+    private ImageButton btn_sendMessage, btn_getFromGallery, btn_takePhoto;
     private EditText et_message;
     private FirebaseUser fUser;
-    private int GALLERY_REQUEST_CODE=1,CAMERA_REQUEST_CODE=2;
+    private int GALLERY_REQUEST_CODE = 1, CAMERA_REQUEST_CODE = 2;
     private String userId;
     FirebaseFirestore db;
     String filename;
     Uri filePath;
-    boolean selected_image=false;
-    boolean take_photo=false;
+    boolean selected_image = false;
+    boolean take_photo = false;
     FirebaseStorage storage;
 
-    private String cameraFilePath="";
+    private String cameraFilePath = "";
+
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-        //This is the directory in which the file will be created. This is the default location of Camera photos
+        //This is the directory in which the file will be created. This is the default location
+        // of Camera photos
         File storageDir = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DCIM), "Camera");
         File image = File.createTempFile(
@@ -89,10 +88,11 @@ public class OpenChatFragment extends Fragment {
         cameraFilePath = "file://" + image.getAbsolutePath();
         return image;
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if(!cameraFilePath.equals("")) {
+        if (!cameraFilePath.equals("")) {
             File file = new File(cameraFilePath);
             if (file.exists()) {
                 file.delete();
@@ -103,7 +103,8 @@ public class OpenChatFragment extends Fragment {
     private void captureFromCamera() {
         try {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(getContext(), BuildConfig.APPLICATION_ID + ".provider", createImageFile()));
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(getContext(),
+                    BuildConfig.APPLICATION_ID + ".provider", createImageFile()));
             startActivityForResult(intent, CAMERA_REQUEST_CODE);
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -116,18 +117,22 @@ public class OpenChatFragment extends Fragment {
         // Inflate the layout for this fragment
         chat.clear();
         View root = inflater.inflate(R.layout.fragment_open_chat, container, false);
-        recyclerView= root.findViewById(R.id.rvChat);
+        recyclerView = root.findViewById(R.id.rvChat);
         recyclerView.setHasFixedSize(true);
         final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
         System.out.println(account.getPhotoUrl());
-        LinearLayoutManager linearLayoutManager= new LinearLayoutManager(getContext());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setStackFromEnd(true);
 
-        chatsFragment= new ChatsFragment();
+        chatsFragment = new ChatsFragment();
+
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatsFragment).commit();
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer, chatsFragment)
+                        .commit();
                 //TODO temporary solution
                 MainActivity.getBottomBar().setVisibility(View.VISIBLE);
             }
@@ -135,16 +140,17 @@ public class OpenChatFragment extends Fragment {
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
 
         recyclerView.setLayoutManager(linearLayoutManager);
-        btn_sendMessage= root.findViewById(R.id.btn_sendMessage);
-        btn_getFromGallery= root.findViewById(R.id.btn_getFromGallery);
-        btn_takePhoto= root.findViewById(R.id.btn_takePhoto);
-        et_message= root.findViewById(R.id.et_message);
-        fUser= FirebaseAuth.getInstance().getCurrentUser();
-        userId=fUser.getUid();
+        btn_sendMessage = root.findViewById(R.id.btn_sendMessage);
+        btn_getFromGallery = root.findViewById(R.id.btn_getFromGallery);
+        btn_takePhoto = root.findViewById(R.id.btn_takePhoto);
+        et_message = root.findViewById(R.id.et_message);
+        fUser = FirebaseAuth.getInstance().getCurrentUser();
+        userId = fUser.getUid();
         storage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();
         db.collection("messages")
-                .document("Bqe17YUMVOc87njQktphxar85R63-cjvJnAr9dubyVrGZ7avyfAyaGFy1").collection("ChatModel")
+                .document("Bqe17YUMVOc87njQktphxar85R63-cjvJnAr9dubyVrGZ7avyfAyaGFy1")
+                .collection("ChatModel")
                 .orderBy("timeSend")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -162,97 +168,119 @@ public class OpenChatFragment extends Fragment {
 
 
                         System.out.println("----------------------UWAGA");
-                        for(ChatModel ch: chat){
-                            System.out.println(ch.getMessage()+ "  "+ch.getSender());
+                        for (ChatModel ch : chat) {
+                            System.out.println(ch.getMessage() + "  " + ch.getSender());
                         }
                         //System.out.println(account.getPhotoUrl());
-                        mAdapter = new ChatAdapter(getContext(), chat,account.getPhotoUrl());
+                        mAdapter = new ChatAdapter(getContext(), chat, account.getPhotoUrl());
                         recyclerView.setAdapter(mAdapter);
                     }
                 });
         btn_sendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               final String message=et_message.getText().toString();
-               boolean photo=false;
-               if(take_photo==true || selected_image==true){
-                   photo=true;
-               }
-               if(!message.equals("") || photo==true) {
-                   chat.clear();
-                   final Date currentTime = Calendar.getInstance().getTime();
-                   if(!message.equals("") && photo==false) {
-                       ChatModel chatModel = new ChatModel(userId, "cjvJnAr9dubyVrGZ7avyfAyaGFy1", message, "", currentTime);
-                       db.collection("messages").document("Bqe17YUMVOc87njQktphxar85R63-cjvJnAr9dubyVrGZ7avyfAyaGFy1").collection("ChatModel").add(chatModel);
-                       et_message.setText("");
-                   } else if(!message.equals("") && photo==true){
-                       StorageReference riversRef = storage.getReference().child("images/"+filename);
-                       final String filename1=filename;
-                       System.out.println(filePath);
-                       UploadTask uploadTask = riversRef.putFile(filePath);
-                       uploadTask.addOnFailureListener(new OnFailureListener() {
-                           @Override
-                           public void onFailure(@NonNull Exception exception) {
-                           }
-                       }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                           @Override
-                           public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                               Toast.makeText(getContext(),"Uploaded photo",Toast.LENGTH_SHORT);
-                               System.out.println("------------------------------FILENAME"+ filename1);
-                               ChatModel chatModel = new ChatModel(userId, "cjvJnAr9dubyVrGZ7avyfAyaGFy1", message, filename1, currentTime);
-                               db.collection("messages").document("Bqe17YUMVOc87njQktphxar85R63-cjvJnAr9dubyVrGZ7avyfAyaGFy1").collection("ChatModel").add(chatModel);
-                               if(!cameraFilePath.equals("")) {
-                                   File file = new File(cameraFilePath);
-                                   if (file.exists()) {
-                                       file.delete();
-                                   }
-                               }
-                           }
-                       });
-                       et_message.setText("");
-                       filename="";
-                       filePath=null;
-                       selected_image=false;
-                       take_photo=false;
-                       btn_takePhoto.setImageResource(R.drawable.ic_photo_camera);
-                       btn_getFromGallery.setImageResource(R.drawable.ic_insert_photo);
-                       btn_takePhoto.setVisibility(View.VISIBLE);
-                       btn_getFromGallery.setVisibility(View.VISIBLE);
-                   } else if(message.equals("") && photo==true){
-                       StorageReference riversRef = storage.getReference().child("images/"+filename);
-                       final String filename1=filename;
-                       System.out.println(filePath);
-                       UploadTask uploadTask = riversRef.putFile(filePath);
-                       uploadTask.addOnFailureListener(new OnFailureListener() {
-                           @Override
-                           public void onFailure(@NonNull Exception exception) {
-                           }
-                       }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                           @Override
-                           public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                               Toast.makeText(getContext(),"Uploaded photo",Toast.LENGTH_SHORT);
-                               System.out.println("------------------------------FILENAME"+ filename1);
-                               ChatModel chatModel = new ChatModel(userId, "cjvJnAr9dubyVrGZ7avyfAyaGFy1", "", filename1, currentTime);
-                               db.collection("messages").document("Bqe17YUMVOc87njQktphxar85R63-cjvJnAr9dubyVrGZ7avyfAyaGFy1").collection("ChatModel").add(chatModel);
-                               if(!cameraFilePath.equals("")) {
-                                   File file = new File(cameraFilePath);
-                                   if (file.exists()) {
-                                       file.delete();
-                                   }
-                               }
-                           }
-                       });
-                       et_message.setText("");
-                       filename="";
-                       filePath=null;
-                       selected_image=false;
-                       take_photo=false;
-                       btn_takePhoto.setImageResource(R.drawable.ic_photo_camera);
-                       btn_getFromGallery.setImageResource(R.drawable.ic_insert_photo);
-                       btn_takePhoto.setVisibility(View.VISIBLE);
-                       btn_getFromGallery.setVisibility(View.VISIBLE);
-                   }
-               }
+                final String message = et_message.getText().toString();
+                boolean photo = false;
+                if (take_photo == true || selected_image == true) {
+                    photo = true;
+                }
+                if (!message.equals("") || photo == true) {
+                    chat.clear();
+                    final Date currentTime = Calendar.getInstance().getTime();
+                    if (!message.equals("") && photo == false) {
+                        ChatModel chatModel = new ChatModel(userId, "cjvJnAr9dubyVrGZ7avyfAyaGFy1",
+                                message, "", currentTime);
+                        db.collection("messages")
+                                .document(
+                                        "Bqe17YUMVOc87njQktphxar85R63-cjvJnAr9dubyVrGZ7avyfAyaGFy1")
+                                .collection("ChatModel")
+                                .add(chatModel);
+                        et_message.setText("");
+                    } else if (!message.equals("") && photo == true) {
+                        StorageReference riversRef = storage.getReference()
+                                .child("images/" + filename);
+                        final String filename1 = filename;
+                        System.out.println(filePath);
+                        UploadTask uploadTask = riversRef.putFile(filePath);
+                        uploadTask.addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                            }
+                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                Toast.makeText(getContext(), "Uploaded photo", Toast.LENGTH_SHORT);
+                                System.out.println(
+                                        "------------------------------FILENAME" + filename1);
+                                ChatModel chatModel = new ChatModel(userId,
+                                        "cjvJnAr9dubyVrGZ7avyfAyaGFy1", message, filename1,
+                                        currentTime);
+                                db.collection("messages")
+                                        .document(
+                                                "Bqe17YUMVOc87njQktphxar85R63" +
+                                                        "-cjvJnAr9dubyVrGZ7avyfAyaGFy1")
+                                        .collection("ChatModel")
+                                        .add(chatModel);
+                                if (!cameraFilePath.equals("")) {
+                                    File file = new File(cameraFilePath);
+                                    if (file.exists()) {
+                                        file.delete();
+                                    }
+                                }
+                            }
+                        });
+                        et_message.setText("");
+                        filename = "";
+                        filePath = null;
+                        selected_image = false;
+                        take_photo = false;
+                        btn_takePhoto.setImageResource(R.drawable.ic_photo_camera);
+                        btn_getFromGallery.setImageResource(R.drawable.ic_insert_photo);
+                        btn_takePhoto.setVisibility(View.VISIBLE);
+                        btn_getFromGallery.setVisibility(View.VISIBLE);
+                    } else if (message.equals("") && photo == true) {
+                        StorageReference riversRef = storage.getReference()
+                                .child("images/" + filename);
+                        final String filename1 = filename;
+                        System.out.println(filePath);
+                        UploadTask uploadTask = riversRef.putFile(filePath);
+                        uploadTask.addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                            }
+                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                Toast.makeText(getContext(), "Uploaded photo", Toast.LENGTH_SHORT);
+                                System.out.println(
+                                        "------------------------------FILENAME" + filename1);
+                                ChatModel chatModel = new ChatModel(userId,
+                                        "cjvJnAr9dubyVrGZ7avyfAyaGFy1", "", filename1, currentTime);
+                                db.collection("messages")
+                                        .document(
+                                                "Bqe17YUMVOc87njQktphxar85R63" +
+                                                        "-cjvJnAr9dubyVrGZ7avyfAyaGFy1")
+                                        .collection("ChatModel")
+                                        .add(chatModel);
+                                if (!cameraFilePath.equals("")) {
+                                    File file = new File(cameraFilePath);
+                                    if (file.exists()) {
+                                        file.delete();
+                                    }
+                                }
+                            }
+                        });
+                        et_message.setText("");
+                        filename = "";
+                        filePath = null;
+                        selected_image = false;
+                        take_photo = false;
+                        btn_takePhoto.setImageResource(R.drawable.ic_photo_camera);
+                        btn_getFromGallery.setImageResource(R.drawable.ic_insert_photo);
+                        btn_takePhoto.setVisibility(View.VISIBLE);
+                        btn_getFromGallery.setVisibility(View.VISIBLE);
+                    }
+                }
 
             }
         });
@@ -261,17 +289,19 @@ public class OpenChatFragment extends Fragment {
             public void onClick(View view) {
                 if (selected_image == false) {
                     Intent intent = new Intent(Intent.ACTION_PICK);
-                    // Sets the type as image/*. This ensures only components of type image are selected
+                    // Sets the type as image/*. This ensures only components of type image are
+                    // selected
                     intent.setType("image/*");
-                    //We pass an extra array with the accepted mime types. This will ensure only components with these MIME types as targeted.
+                    //We pass an extra array with the accepted mime types. This will ensure only
+                    // components with these MIME types as targeted.
                     String[] mimeTypes = {"image/jpeg", "image/png"};
                     intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
                     // Launching the Intent
                     startActivityForResult(intent, GALLERY_REQUEST_CODE);
                 } else {
-                    selected_image=false;
-                    filename="";
-                    filePath=null;
+                    selected_image = false;
+                    filename = "";
+                    filePath = null;
                     btn_getFromGallery.setImageResource(R.drawable.ic_insert_photo);
                     btn_takePhoto.setVisibility(View.VISIBLE);
                     btn_getFromGallery.setVisibility(View.VISIBLE);
@@ -288,30 +318,31 @@ public class OpenChatFragment extends Fragment {
         return root;
     }
 
-    public void onActivityResult(int requestCode,int resultCode,Intent data){
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Result code is RESULT_OK only if the user selects an Image
         if (resultCode == Activity.RESULT_OK) {
-            if(requestCode==GALLERY_REQUEST_CODE) {
+            if (requestCode == GALLERY_REQUEST_CODE) {
                 //data.getData returns the content URI for the selected Image
                 Uri selectedImage = data.getData();
-                filePath=Uri.fromFile(new File(getRealPathFromURI(selectedImage)));
-                filename=filePath.getLastPathSegment();
+                filePath = Uri.fromFile(new File(getRealPathFromURI(selectedImage)));
+                filename = filePath.getLastPathSegment();
                 btn_getFromGallery.setImageResource(R.drawable.ic_cancel);
                 btn_takePhoto.setVisibility(View.INVISIBLE);
-                selected_image=true;
-            } else if(requestCode==CAMERA_REQUEST_CODE){
+                selected_image = true;
+            } else if (requestCode == CAMERA_REQUEST_CODE) {
                 btn_takePhoto.setImageResource(R.drawable.ic_cancel);
                 btn_getFromGallery.setVisibility(View.INVISIBLE);
-                filePath=Uri.fromFile(new File(getRealPathFromURI(Uri.parse(cameraFilePath))));
-                filename=filePath.getLastPathSegment();
-                take_photo=true;
+                filePath = Uri.fromFile(new File(getRealPathFromURI(Uri.parse(cameraFilePath))));
+                filename = filePath.getLastPathSegment();
+                take_photo = true;
             }
         }
     }
 
     private String getRealPathFromURI(Uri contentURI) {
         String result;
-        Cursor cursor = getActivity().getContentResolver().query(contentURI, null, null, null, null);
+        Cursor cursor = getActivity().getContentResolver()
+                .query(contentURI, null, null, null, null);
         if (cursor == null) { // Source is Dropbox or other similar local file path
             result = contentURI.getPath();
         } else {

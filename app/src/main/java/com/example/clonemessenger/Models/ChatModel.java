@@ -1,4 +1,4 @@
-package com.example.clonemessenger;
+package com.example.clonemessenger.Models;
 
 import java.util.Date;
 

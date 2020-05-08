@@ -37,45 +37,57 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         authenticationFragment = new AuthenticationFragment();
-        openChatFragment=new OpenChatFragment();
+        openChatFragment = new OpenChatFragment();
 
         contactFragment = new ContactFragment();
         chatsFragment = new ChatsFragment();
         settingsFragment = new SettingsFragment();
-        //  Optional<GoogleSignInAccount> account= Optional.ofNullable(GoogleSignIn.getLastSignedInAccount(getApplicationContext()));
+        //  Optional<GoogleSignInAccount> account= Optional.ofNullable(GoogleSignIn
+        //  .getLastSignedInAccount(getApplicationContext()));
         bottomBar = findViewById(R.id.bottomBar);
-        bottomBar.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.action_contacts:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, contactFragment).commit();
+        bottomBar.setOnNavigationItemSelectedListener(
+                new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.action_contacts:
+                                getSupportFragmentManager().beginTransaction()
+                                        .replace(R.id.fragmentContainer, contactFragment)
+                                        .commit();
+                                return true;
+                            case R.id.action_chats:
+                                getSupportFragmentManager().beginTransaction()
+                                        .replace(R.id.fragmentContainer, chatsFragment)
+                                        .commit();
+                                return true;
+                            case R.id.action_settings:
+                                getSupportFragmentManager().beginTransaction()
+                                        .replace(R.id.fragmentContainer, settingsFragment)
+                                        .commit();
+                                return true;
+                        }
                         return true;
-                    case R.id.action_chats:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatsFragment).commit();
-                        return true;
-                    case R.id.action_settings:
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, settingsFragment).commit();
-                        return true;
-                }
-                return true;
-            }
-        });
+                    }
+                });
 
-        toLogin=findViewById(R.id.button1);
+        toLogin = findViewById(R.id.button1);
 
         toLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, authenticationFragment).commit();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainer, authenticationFragment)
+                        .commit();
             }
         });
-        toChat=findViewById(R.id.button2);
+        toChat = findViewById(R.id.button2);
 
         toChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, openChatFragment).commit();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainer, openChatFragment)
+                        .commit();
             }
         });
     }
