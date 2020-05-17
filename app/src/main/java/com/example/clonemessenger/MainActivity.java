@@ -1,12 +1,14 @@
 package com.example.clonemessenger;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -23,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
     Button toLogin;
     Button toChat;
 //    Button secondFragmentButton;
-
     AuthenticationFragment authenticationFragment;
     ContactFragment contactFragment;
     ChatsFragment chatsFragment;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     static public BottomNavigationView bottomBar;
     OpenChatFragment openChatFragment;
 
-    @Override
+   @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         //  Optional<GoogleSignInAccount> account= Optional.ofNullable(GoogleSignIn
         //  .getLastSignedInAccount(getApplicationContext()));
         bottomBar = findViewById(R.id.bottomBar);
+
         bottomBar.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -94,5 +96,9 @@ public class MainActivity extends AppCompatActivity {
 
     static public BottomNavigationView getBottomBar() {
         return bottomBar;
+    }
+
+    public String getCostam(){
+        return "Udalo sie";
     }
 }

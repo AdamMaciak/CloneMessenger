@@ -31,7 +31,7 @@ public class ChatsFragment extends Fragment {
         toChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().getSupportFragmentManager()
+                getParentFragmentManager()
                         .beginTransaction()
                         .replace(R.id.fragmentContainer, openChatFragment)
                         .commit();

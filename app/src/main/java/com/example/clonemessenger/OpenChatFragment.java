@@ -99,7 +99,6 @@ public class OpenChatFragment extends Fragment {
             }
         }
     }
-
     private void captureFromCamera() {
         try {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -120,10 +119,9 @@ public class OpenChatFragment extends Fragment {
         recyclerView = root.findViewById(R.id.rvChat);
         recyclerView.setHasFixedSize(true);
         final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
-        System.out.println(account.getPhotoUrl());
+//        System.out.println(account.getPhotoUrl());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setStackFromEnd(true);
-
         chatsFragment = new ChatsFragment();
 
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
@@ -172,7 +170,9 @@ public class OpenChatFragment extends Fragment {
                             System.out.println(ch.getMessage() + "  " + ch.getSender());
                         }
                         //System.out.println(account.getPhotoUrl());
-                        mAdapter = new ChatAdapter(getContext(), chat, account.getPhotoUrl());
+//                        mAdapter = new ChatAdapter(getContext(), chat, account.getPhotoUrl());
+
+                        mAdapter = new ChatAdapter(getContext(), chat, null);
                         recyclerView.setAdapter(mAdapter);
                     }
                 });

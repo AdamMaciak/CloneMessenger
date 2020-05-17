@@ -2,7 +2,9 @@ package com.example.clonemessenger.Models;
 
 import java.util.Date;
 
-public class ChatModel {
+public class
+
+ChatModel {
     private String sender;
     private String receiver;
     private String message;
