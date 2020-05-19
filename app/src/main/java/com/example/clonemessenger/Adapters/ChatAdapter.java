@@ -1,4 +1,4 @@
-package com.example.clonemessenger;
+package com.example.clonemessenger.Adapters;
 
 import android.content.Context;
 import android.net.Uri;
@@ -7,22 +7,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.clonemessenger.Models.ChatModel;
+import com.example.clonemessenger.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 
-import java.net.Socket;
 import java.util.List;
-import java.util.SortedSet;
+
+import static android.widget.Toast.LENGTH_SHORT;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     public static final int msg_left = 0;
@@ -39,6 +40,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         this.profilePhotoUrl = profilePhotoUrl;
         fUser= FirebaseAuth.getInstance().getCurrentUser();
     }
+
 
     @NonNull
     @Override
@@ -85,7 +87,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         return mChat.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView show_message;
         public ImageView profile_image;
@@ -96,6 +98,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             show_image = itemView.findViewById(R.id.show_image);
             profile_image = itemView.findViewById(R.id.profile_image);
             show_message = itemView.findViewById(R.id.show_message);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(mContext,"AAAAAAAAAAAAAAAAAAAAAAAAAAAA", LENGTH_SHORT).show();
+                }
+            });
         }
     }
 

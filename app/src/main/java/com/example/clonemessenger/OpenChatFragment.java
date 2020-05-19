@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.clonemessenger.Adapters.ChatAdapter;
 import com.example.clonemessenger.Models.ChatModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -281,7 +282,6 @@ public class OpenChatFragment extends Fragment {
                         btn_getFromGallery.setVisibility(View.VISIBLE);
                     }
                 }
-
             }
         });
         btn_getFromGallery.setOnClickListener(new View.OnClickListener() {
