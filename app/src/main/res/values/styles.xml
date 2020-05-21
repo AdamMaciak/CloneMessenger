@@ -8,4 +8,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="RedTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">#DF0D0D</item>
+        <item name="colorPrimaryDark">#9A0C0C</item>
+        <item name="android:navigationBarColor">#9A0C0C</item>
+    </style>
+
 </resources>

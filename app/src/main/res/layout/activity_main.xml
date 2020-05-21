@@ -22,7 +22,7 @@
         android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:background="@color/colorPrimary"
+        android:background="?attr/colorPrimary"
         app:itemIconTint="@color/colorActionIcon"
         app:itemTextColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CloneMessenger</string>
+    <string name="hello_blank_fragment">Witaj w pustym fragmencie</string>
+    <string name="sign_in">Zaloguj się</string>
+    <string name="sign_out">Wyloguj się</string>
+    <string name="ch_language">Zmień język</string>
+    <string name="ch_interface_color">Zmień kolor interfejsu</string>
+    <string name="chats">Czat</string>
+    <string name="contacts">Kontakty</string>
+    <string name="Settings">Ustawienia</string>
+</resources>

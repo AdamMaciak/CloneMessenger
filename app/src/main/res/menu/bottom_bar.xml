@@ -6,15 +6,15 @@
         android:id="@+id/action_chats"
         android:enabled="true"
         android:icon="@drawable/ic_chat_24px"
-        android:title="Chats" />
+        android:title="@string/chats" />
     <item
         android:id="@+id/action_contacts"
         android:enabled="true"
         android:icon="@drawable/ic_call_24px"
-        android:title="Contacts" />
+        android:title="@string/contacts" />
     <item
         android:id="@+id/action_settings"
         android:enabled="true"
         android:icon="@drawable/ic_settings_applications_24px"
-        android:title="Settings" />
+        android:title="@string/Settings" />
 </menu>
