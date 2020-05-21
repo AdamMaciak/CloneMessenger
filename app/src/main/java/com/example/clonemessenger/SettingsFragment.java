@@ -139,11 +139,11 @@ public class SettingsFragment extends Fragment{
         MobileAds.initialize(getContext(), new OnInitializationCompleteListener() {
             @Override
             public void onInitializationComplete(InitializationStatus initializationStatus) {
-                mAdView = view.findViewById(R.id.adView);
-                AdRequest adRequest = new AdRequest.Builder().build();
-                mAdView.loadAd(adRequest);
             }
         });
+        mAdView = view.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         if(SharedPrefUser.getInstance(getContext()).isLoggedIn()){
             UserSharedPref userSharedPref=SharedPrefUser.getInstance(getContext()).getUser();
