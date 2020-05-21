@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -33,6 +34,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.clonemessenger.Models.ChatModel;
 import com.example.clonemessenger.Models.UserModel;
+import com.example.clonemessenger.Models.UserSharedPref;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
@@ -111,11 +113,6 @@ public class SettingsFragment extends Fragment{
         ll_chInterfaceColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*ActionBar actionBar=((AppCompatActivity)getActivity()).getSupportActionBar();
-                actionBar.setBackgroundDrawable(new ColorDrawable(0xff00DDED));
-                actionBar.setDisplayShowTitleEnabled(false);
-                actionBar.setDisplayShowTitleEnabled(true);*/
-
                 showChangeInterfaceColor();
             }
         });
@@ -128,9 +125,10 @@ public class SettingsFragment extends Fragment{
             }
         });
 
-        if(account!=null){
-            Glide.with(getContext()).load(account.getPhotoUrl()).into(im_userPhoto);
-            tx_userName.setText(account.getDisplayName());
+        if(SharedPrefUser.getInstance(getContext()).isLoggedIn()){
+            UserSharedPref userSharedPref=SharedPrefUser.getInstance(getContext()).getUser();
+            Glide.with(getContext()).load(Uri.parse(userSharedPref.getImagePath())).into(im_userPhoto);
+            tx_userName.setText(userSharedPref.getName());
             im_log.setImageResource(R.drawable.ic_logout);
             tx_log.setText(getResources().getString(R.string.sign_out));
             tx_userName.setVisibility(View.VISIBLE);
@@ -138,16 +136,7 @@ public class SettingsFragment extends Fragment{
             ll_log.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    /*getActivity().getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.fragmentContainer, authenticationFragment)
-                            .commit();*/
-                    mGoogleSignInClient.signOut();
-                    Toast.makeText(getActivity(), "You are Logged Out", Toast.LENGTH_SHORT).show();
-                    im_log.setImageResource(R.drawable.ic_login);
-                    tx_log.setText(getResources().getString(R.string.sign_in));
-                    tx_userName.setVisibility(View.GONE);
-                    im_userPhoto.setVisibility(View.GONE);
+                   signOut();
                 }
             });
         } else {
@@ -160,10 +149,23 @@ public class SettingsFragment extends Fragment{
         }
         mainActivity = (MainActivity) getActivity();
         context = getActivity();
-        //Toast.makeText(context,mainActivity.getCostam(),Toast.LENGTH_LONG).show();
         return view;
     }
-
+    private void signOut() {
+        mGoogleSignInClient.signOut();
+        SharedPrefUser.getInstance(getContext()).logout();
+        Toast.makeText(getActivity(), "You are Logged Out", Toast.LENGTH_SHORT).show();
+        im_log.setImageResource(R.drawable.ic_login);
+        tx_log.setText(getResources().getString(R.string.sign_in));
+        tx_userName.setVisibility(View.GONE);
+        im_userPhoto.setVisibility(View.GONE);
+        ll_log.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signIn();
+            }
+        });
+    }
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -229,12 +231,16 @@ public class SettingsFragment extends Fragment{
                         UserModel userModel = documentSnapshot.toObject(UserModel.class);
                         tx_userName.setText(userModel.getName());
                         Glide.with(getContext()).load(userModel.getImagePath()).into(im_userPhoto);
+                        UserSharedPref userSharedPref=new UserSharedPref(userModel.getName(),userModel.getImagePath(),fUser.getUid());
+                        SharedPrefUser.getInstance(getContext()).userLogin(userSharedPref);
 
                     } else {
                         UserModel user=new UserModel(account.getDisplayName(),account.getPhotoUrl().toString());
                         db.collection("user").document(fUser.getUid()).set(user);
                         Glide.with(getContext()).load(account.getPhotoUrl()).into(im_userPhoto);
                         tx_userName.setText(account.getDisplayName());
+                        UserSharedPref userSharedPref=new UserSharedPref(account.getDisplayName(),account.getPhotoUrl().toString(),fUser.getUid());
+                        SharedPrefUser.getInstance(getContext()).userLogin(userSharedPref);
                         }
                     }
                 });
@@ -246,12 +252,7 @@ public class SettingsFragment extends Fragment{
             ll_log.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mGoogleSignInClient.signOut();
-                    Toast.makeText(getActivity(), "You are Logged Out", Toast.LENGTH_SHORT).show();
-                    im_log.setImageResource(R.drawable.ic_login);
-                    tx_log.setText(getResources().getString(R.string.sign_in));
-                    tx_userName.setVisibility(View.GONE);
-                    im_userPhoto.setVisibility(View.GONE);
+                    signOut();
                 }
             });
         }
