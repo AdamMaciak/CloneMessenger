@@ -2,22 +2,31 @@ package com.example.clonemessenger;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -36,7 +45,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        getLocale();
+        SharedPreferences preferences=getSharedPreferences("Settings",MODE_PRIVATE);
+        String colour= preferences.getString("ColorInterface","");
+       MobileAds.initialize(this, new OnInitializationCompleteListener() {
+           @Override
+           public void onInitializationComplete(InitializationStatus initializationStatus) {
+           }
+       });
+        switch(colour) {
+            case "red":
+                setTheme(R.style.RedTheme);
+                break;
+            case "purple":
+                setTheme(R.style.AppTheme);
+                break;
+        }
+        ActionBar actionBar=getSupportActionBar();
+        actionBar.setTitle(getResources().getString(R.string.app_name));
         authenticationFragment = new AuthenticationFragment();
         openChatFragment = new OpenChatFragment();
 
@@ -100,5 +126,21 @@ public class MainActivity extends AppCompatActivity {
 
     public String getCostam(){
         return "Udalo sie";
+    }
+    private void setLocale(String lang) {
+        Locale locale=new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration configuration=new Configuration();
+        configuration.locale=locale;
+        getResources().updateConfiguration(configuration,getResources().getDisplayMetrics());
+        SharedPreferences.Editor editor= getSharedPreferences("Settings", Context.MODE_PRIVATE).edit();
+        editor.putString("Lang",lang);
+        editor.apply();
+
+    }
+    public void getLocale(){
+        SharedPreferences preferences=getSharedPreferences("Settings",MODE_PRIVATE);
+        String language= preferences.getString("Lang","");
+        setLocale(language);
     }
 }
