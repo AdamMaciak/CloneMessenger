@@ -11,6 +11,7 @@ public class SharedPrefUser {
     private static final String SHARED_PREF_NAME = "userData"; // może krzaczyć
     private static final String KEY_NAME = "keyname";
     private static final String KEY_PHOTOPATH = "keyphotopath";
+    private static final String KEY_PHOTOCOMPRESSPATH = "keyphotocompresspath";
     private static final String KEY_ID = "keyid";
     private static SharedPrefUser mInstance;
     private static Context mCtx;
@@ -33,6 +34,13 @@ public class SharedPrefUser {
         editor.putString(KEY_ID, userSharedPref.getId());
         editor.putString(KEY_NAME, userSharedPref.getName());
         editor.putString(KEY_PHOTOPATH, userSharedPref.getImagePath());
+        editor.putString(KEY_PHOTOCOMPRESSPATH, userSharedPref.getImageCompressPath());
+        editor.apply();
+    }
+    public void setUserName(String userName){
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_NAME, userName);
         editor.apply();
     }
 
@@ -47,6 +55,7 @@ public class SharedPrefUser {
         return new UserSharedPref(
                 sharedPreferences.getString(KEY_NAME, null),
                 sharedPreferences.getString(KEY_PHOTOPATH, null),
+                sharedPreferences.getString(KEY_PHOTOCOMPRESSPATH, null),
                 sharedPreferences.getString(KEY_ID, null));
     }
 

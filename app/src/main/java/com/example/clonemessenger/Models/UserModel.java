@@ -5,8 +5,23 @@ import android.net.Uri;
 public class UserModel {
     String name;
     String imagePath;
+    String imageCompressPath;
 
     public UserModel() {
+    }
+
+    public String getImageCompressPath() {
+        return imageCompressPath;
+    }
+
+    public UserModel(String name, String imagePath, String imageCompressPath) {
+        this.name = name;
+        this.imagePath = imagePath;
+        this.imageCompressPath = imageCompressPath;
+    }
+
+    public void setImageCompressPath(String imageCompressPath) {
+        this.imageCompressPath = imageCompressPath;
     }
 
     public UserModel(String name, String imagePath) {

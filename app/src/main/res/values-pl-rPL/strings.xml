@@ -6,7 +6,12 @@
     <string name="sign_out">Wyloguj się</string>
     <string name="ch_language">Zmień język</string>
     <string name="ch_interface_color">Zmień kolor interfejsu</string>
+    <string name="ch_userName">Zmień nazwę użytkownika</string>
+    <string name="ch_userPhoto">Zmień zdjęcie użytkownika</string>
     <string name="chats">Czat</string>
     <string name="contacts">Kontakty</string>
     <string name="Settings">Ustawienia</string>
+    <string name="ch_userNameE">Wprowadź nową nazwę użytkownika</string>
+    <string name="save">Zapisz</string>
+    <string name="changePhoto">Trwa zmiana zdjęcia</string>
 </resources>
