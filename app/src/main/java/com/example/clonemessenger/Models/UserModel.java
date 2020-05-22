@@ -6,8 +6,24 @@ public class UserModel {
     String name;
     String imagePath;
     String imageCompressPath;
+    boolean fullVersion;
 
     public UserModel() {
+    }
+
+    public boolean isFullVersion() {
+        return fullVersion;
+    }
+
+    public UserModel(String name, String imagePath, String imageCompressPath, boolean fullVersion) {
+        this.name = name;
+        this.imagePath = imagePath;
+        this.imageCompressPath = imageCompressPath;
+        this.fullVersion = fullVersion;
+    }
+
+    public void setFullVersion(boolean fullVersion) {
+        this.fullVersion = fullVersion;
     }
 
     public String getImageCompressPath() {

@@ -13,6 +13,7 @@ public class SharedPrefUser {
     private static final String KEY_PHOTOPATH = "keyphotopath";
     private static final String KEY_PHOTOCOMPRESSPATH = "keyphotocompresspath";
     private static final String KEY_ID = "keyid";
+    private static final String KEY_FULLVERSION = "keyfullversion";
     private static SharedPrefUser mInstance;
     private static Context mCtx;
 
@@ -35,12 +36,19 @@ public class SharedPrefUser {
         editor.putString(KEY_NAME, userSharedPref.getName());
         editor.putString(KEY_PHOTOPATH, userSharedPref.getImagePath());
         editor.putString(KEY_PHOTOCOMPRESSPATH, userSharedPref.getImageCompressPath());
+        editor.putBoolean(KEY_FULLVERSION, userSharedPref.isFullVersion());
         editor.apply();
     }
     public void setUserName(String userName){
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(KEY_NAME, userName);
+        editor.apply();
+    }
+    public void setFullversion(boolean fullversion){
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(KEY_FULLVERSION, fullversion);
         editor.apply();
     }
 
@@ -56,7 +64,8 @@ public class SharedPrefUser {
                 sharedPreferences.getString(KEY_NAME, null),
                 sharedPreferences.getString(KEY_PHOTOPATH, null),
                 sharedPreferences.getString(KEY_PHOTOCOMPRESSPATH, null),
-                sharedPreferences.getString(KEY_ID, null));
+                sharedPreferences.getString(KEY_ID, null),
+                sharedPreferences.getBoolean(KEY_FULLVERSION,false));
     }
 
 

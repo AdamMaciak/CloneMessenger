@@ -13,6 +13,7 @@
     <string name="ch_userNameE">Enter a new username</string>
     <string name="save">Save</string>
     <string name="changePhoto">Photo change in progress</string>
-
-
+    <string name="removeAds">Buy version without ads</string>
+    <string name="fullVersion">Pełna wersja</string>
+    <string name="unlockFullVersion">Version without ads unlocked</string>
 </resources>

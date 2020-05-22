@@ -14,4 +14,7 @@
     <string name="ch_userNameE">Wprowadź nową nazwę użytkownika</string>
     <string name="save">Zapisz</string>
     <string name="changePhoto">Trwa zmiana zdjęcia</string>
+    <string name="removeAds">Kup wersję bez reklam</string>
+    <string name="fullVersion">Full version</string>
+    <string name="unlockFullVersion">Odblokowano wersję bez reklam</string>
 </resources>

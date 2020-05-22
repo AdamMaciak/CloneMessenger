@@ -1,5 +1,6 @@
 package com.example.clonemessenger;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -26,6 +27,7 @@ import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
+import android.util.Config;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -71,10 +73,16 @@ import com.google.firebase.firestore.auth.User;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.paypal.android.sdk.payments.PayPalConfiguration;
+import com.paypal.android.sdk.payments.PayPalPayment;
+import com.paypal.android.sdk.payments.PayPalService;
+import com.paypal.android.sdk.payments.PaymentActivity;
+import com.paypal.android.sdk.payments.PaymentConfirmation;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
@@ -89,7 +97,7 @@ public class SettingsFragment extends Fragment{
     GoogleSignInAccount account;
     TextView tx_userName,tx_log;
     ImageView im_userPhoto,im_log;
-    LinearLayout ll_log, ll_chLanguange, ll_chInterfaceColor, ll_chUserName, ll_chUserPhoto;
+    LinearLayout ll_log, ll_chLanguange, ll_chInterfaceColor, ll_chUserName, ll_chUserPhoto, ll_removeAds;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
     private int RC_SIGN_IN = 1;
@@ -99,11 +107,26 @@ public class SettingsFragment extends Fragment{
     Dialog chUserName;
     int galleryRequestCode=2;
     FirebaseStorage storage;
+    Context mContext;
+    public static final int PAYPAL_REQUEST_CODE=7171;
+    public static final String PAYPAL_CLIENT_ID= "AZKoWU4wSPYaJ8eyXiz04Ley0tNyBNNnIu7-vdkcr2QbPK-BLVlOwlCJAbDIoWuj7YmB8M0LQ-0bfwrW";
+    private PayPalConfiguration config= new PayPalConfiguration().environment(PayPalConfiguration.ENVIRONMENT_SANDBOX).clientId(PAYPAL_CLIENT_ID);
+
+    @Override
+    public void onDestroy() {
+        getContext().stopService(new Intent(getContext(),PayPalService.class));
+        super.onDestroy();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_settings, container, false);
 
+        Intent intent= new Intent(getContext(),PayPalService.class);
+        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION,config);
+        getContext().startService(intent);
+        mContext=getContext();
         mAuth = FirebaseAuth.getInstance();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(
                 GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -112,9 +135,11 @@ public class SettingsFragment extends Fragment{
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(getContext(), gso);
+
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
         account = GoogleSignIn.getLastSignedInAccount(getContext());
+
         tx_userName=(TextView) view.findViewById(R.id.tx_userName);
         im_userPhoto=(ImageView) view.findViewById(R.id.im_profilePhoto);
         tx_log=(TextView) view.findViewById(R.id.tx_log);
@@ -124,6 +149,13 @@ public class SettingsFragment extends Fragment{
         ll_chInterfaceColor=(LinearLayout) view.findViewById(R.id.ll_chInterfColor);
         ll_chUserName=(LinearLayout) view.findViewById(R.id.ll_chUserName);
         ll_chUserPhoto=(LinearLayout) view.findViewById(R.id.ll_chUserPhoto);
+        ll_removeAds= (LinearLayout) view.findViewById(R.id.ll_removeAds);
+        ll_removeAds.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buyFullVersion();
+            }
+        });
         ll_chLanguange.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -141,12 +173,17 @@ public class SettingsFragment extends Fragment{
             public void onInitializationComplete(InitializationStatus initializationStatus) {
             }
         });
-        mAdView = view.findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
 
         if(SharedPrefUser.getInstance(getContext()).isLoggedIn()){
             UserSharedPref userSharedPref=SharedPrefUser.getInstance(getContext()).getUser();
+            if(userSharedPref.isFullVersion()==false){
+                mAdView = view.findViewById(R.id.adView);
+                AdRequest adRequest = new AdRequest.Builder().build();
+                mAdView.loadAd(adRequest);
+            } else {
+                mAdView.setVisibility(View.GONE);
+                ll_removeAds.setVisibility(View.GONE);
+            }
             Glide.with(getContext()).load(Uri.parse(userSharedPref.getImageCompressPath())).into(im_userPhoto);
             tx_userName.setText(userSharedPref.getName());
             im_log.setImageResource(R.drawable.ic_logout);
@@ -200,6 +237,9 @@ public class SettingsFragment extends Fragment{
                 }
             });
         } else {
+            mAdView = view.findViewById(R.id.adView);
+            AdRequest adRequest = new AdRequest.Builder().build();
+            mAdView.loadAd(adRequest);
             ll_chUserName.setVisibility(View.GONE);
             ll_chUserPhoto.setVisibility(View.GONE);
             ll_log.setOnClickListener(new View.OnClickListener() {
@@ -208,11 +248,21 @@ public class SettingsFragment extends Fragment{
                     signIn();
                 }
             });
+            ll_removeAds.setVisibility(View.GONE);
         }
         mainActivity = (MainActivity) getActivity();
         context = getActivity();
         return view;
     }
+
+    private void buyFullVersion(){
+        PayPalPayment payPalPayment=new PayPalPayment(new BigDecimal(5),"PLN",getResources().getString(R.string.fullVersion),PayPalPayment.PAYMENT_INTENT_SALE);
+        Intent intent=new Intent(getContext(), PaymentActivity.class);
+        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION,config);
+        intent.putExtra(PaymentActivity.EXTRA_PAYMENT,payPalPayment);
+        startActivityForResult(intent,PAYPAL_REQUEST_CODE);
+    }
+
     private void signOut() {
         mGoogleSignInClient.signOut();
         SharedPrefUser.getInstance(getContext()).logout();
@@ -305,6 +355,23 @@ public class SettingsFragment extends Fragment{
                     });
                 }
             });
+        } else if(requestCode==PAYPAL_REQUEST_CODE){
+            if(resultCode==RESULT_OK){
+                PaymentConfirmation confirmation=data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
+                if(confirmation!=null){
+                    SharedPrefUser.getInstance(getContext()).setFullversion(true);
+                    UserSharedPref userSharedPref=SharedPrefUser.getInstance(getContext()).getUser();
+                    UserModel user=new UserModel(userSharedPref.getName(),userSharedPref.getImagePath(),userSharedPref.getImageCompressPath(),userSharedPref.isFullVersion());
+                    db.collection("user").document(userSharedPref.getId()).set(user);
+                    mAdView.setVisibility(View.GONE);
+                    ll_removeAds.setVisibility(View.GONE);
+                    Toast.makeText(getActivity(),getResources().getString(R.string.unlockFullVersion),Toast.LENGTH_LONG);
+                }
+            } else if(resultCode== Activity.RESULT_CANCELED) {
+                Toast.makeText(getContext(),"Cancel",Toast.LENGTH_SHORT).show();
+            }
+        } else if(resultCode== PaymentActivity.RESULT_EXTRAS_INVALID) {
+            Toast.makeText(getContext(), "Invalid", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -372,16 +439,23 @@ public class SettingsFragment extends Fragment{
                         UserModel userModel = documentSnapshot.toObject(UserModel.class);
                         tx_userName.setText(userModel.getName());
                         Glide.with(getContext()).load(userModel.getImageCompressPath()).into(im_userPhoto);
-                        UserSharedPref userSharedPref=new UserSharedPref(userModel.getName(),userModel.getImagePath(),userModel.getImageCompressPath(),fUser.getUid());
+                        UserSharedPref userSharedPref=new UserSharedPref(userModel.getName(),userModel.getImagePath(),userModel.getImageCompressPath(),fUser.getUid(),userModel.isFullVersion());
                         SharedPrefUser.getInstance(getContext()).userLogin(userSharedPref);
+                        if(userSharedPref.isFullVersion()==true){
+                            mAdView.setVisibility(View.GONE);
+                            ll_removeAds.setVisibility(View.GONE);
+                        } else {
+                            ll_removeAds.setVisibility(View.VISIBLE);
+                        }
 
                     } else {
                         UserModel user=new UserModel(account.getDisplayName(),"null",account.getPhotoUrl().toString());
                         db.collection("user").document(fUser.getUid()).set(user);
                         Glide.with(getContext()).load(account.getPhotoUrl()).into(im_userPhoto);
                         tx_userName.setText(account.getDisplayName());
-                        UserSharedPref userSharedPref=new UserSharedPref(account.getDisplayName(),"null",account.getPhotoUrl().toString(),fUser.getUid());
+                        UserSharedPref userSharedPref=new UserSharedPref(account.getDisplayName(),"null",account.getPhotoUrl().toString(),fUser.getUid(),false);
                         SharedPrefUser.getInstance(getContext()).userLogin(userSharedPref);
+                        ll_removeAds.setVisibility(View.VISIBLE);
                         }
                     }
                 });
@@ -392,6 +466,7 @@ public class SettingsFragment extends Fragment{
             im_userPhoto.setVisibility(View.VISIBLE);
             ll_chUserName.setVisibility(View.VISIBLE);
             ll_chUserPhoto.setVisibility(View.VISIBLE);
+            ll_removeAds.setVisibility(View.VISIBLE);
             ll_log.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

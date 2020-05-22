@@ -5,6 +5,7 @@ public class UserSharedPref {
     String imagePath;
     String imageCompressPath;
     String id;
+    boolean fullVersion;
 
     public String getImageCompressPath() {
         return imageCompressPath;
@@ -15,6 +16,22 @@ public class UserSharedPref {
         this.imagePath = imagePath;
         this.imageCompressPath = imageCompressPath;
         this.id = id;
+    }
+
+    public UserSharedPref(String name, String imagePath, String imageCompressPath, String id, boolean fullVersion) {
+        this.name = name;
+        this.imagePath = imagePath;
+        this.imageCompressPath = imageCompressPath;
+        this.id = id;
+        this.fullVersion = fullVersion;
+    }
+
+    public boolean isFullVersion() {
+        return fullVersion;
+    }
+
+    public void setFullVersion(boolean fullVersion) {
+        this.fullVersion = fullVersion;
     }
 
     public void setImageCompressPath(String imageCompressPath) {
