@@ -1,14 +1,20 @@
 package com.example.clonemessenger;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,19 +26,24 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 
+import android.provider.MediaStore;
+import android.util.Config;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.clonemessenger.Models.ChatModel;
 import com.example.clonemessenger.Models.UserModel;
+import com.example.clonemessenger.Models.UserSharedPref;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
@@ -59,32 +70,63 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.auth.User;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.paypal.android.sdk.payments.PayPalConfiguration;
+import com.paypal.android.sdk.payments.PayPalPayment;
+import com.paypal.android.sdk.payments.PayPalService;
+import com.paypal.android.sdk.payments.PaymentActivity;
+import com.paypal.android.sdk.payments.PaymentConfirmation;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class SettingsFragment extends Fragment{
-    Button toLogin;
+    Button toLogin, save;
+    EditText newUserName;
     AuthenticationFragment authenticationFragment;
     MainActivity mainActivity;
     Context context;
     GoogleSignInAccount account;
     TextView tx_userName,tx_log;
     ImageView im_userPhoto,im_log;
-    LinearLayout ll_log, ll_chLanguange,ll_chInterfaceColor;
+    LinearLayout ll_log, ll_chLanguange, ll_chInterfaceColor, ll_chUserName, ll_chUserPhoto, ll_removeAds;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
     private int RC_SIGN_IN = 1;
     AdView mAdView;
     View view;
     FirebaseFirestore db;
+    Dialog chUserName;
+    int galleryRequestCode=2;
+    FirebaseStorage storage;
+    Context mContext;
+    public static final int PAYPAL_REQUEST_CODE=7171;
+    public static final String PAYPAL_CLIENT_ID= "AZKoWU4wSPYaJ8eyXiz04Ley0tNyBNNnIu7-vdkcr2QbPK-BLVlOwlCJAbDIoWuj7YmB8M0LQ-0bfwrW";
+    private PayPalConfiguration config= new PayPalConfiguration().environment(PayPalConfiguration.ENVIRONMENT_SANDBOX).clientId(PAYPAL_CLIENT_ID);
+
+    @Override
+    public void onDestroy() {
+        getContext().stopService(new Intent(getContext(),PayPalService.class));
+        super.onDestroy();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_settings, container, false);
 
+        Intent intent= new Intent(getContext(),PayPalService.class);
+        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION,config);
+        getContext().startService(intent);
+        mContext=getContext();
         mAuth = FirebaseAuth.getInstance();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(
                 GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -93,8 +135,11 @@ public class SettingsFragment extends Fragment{
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(getContext(), gso);
+
         db = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
         account = GoogleSignIn.getLastSignedInAccount(getContext());
+
         tx_userName=(TextView) view.findViewById(R.id.tx_userName);
         im_userPhoto=(ImageView) view.findViewById(R.id.im_profilePhoto);
         tx_log=(TextView) view.findViewById(R.id.tx_log);
@@ -102,6 +147,15 @@ public class SettingsFragment extends Fragment{
         ll_log=(LinearLayout) view.findViewById(R.id.ll_sign);
         ll_chLanguange=(LinearLayout) view.findViewById(R.id.ll_chLang);
         ll_chInterfaceColor=(LinearLayout) view.findViewById(R.id.ll_chInterfColor);
+        ll_chUserName=(LinearLayout) view.findViewById(R.id.ll_chUserName);
+        ll_chUserPhoto=(LinearLayout) view.findViewById(R.id.ll_chUserPhoto);
+        ll_removeAds= (LinearLayout) view.findViewById(R.id.ll_removeAds);
+        ll_removeAds.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buyFullVersion();
+            }
+        });
         ll_chLanguange.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -111,59 +165,121 @@ public class SettingsFragment extends Fragment{
         ll_chInterfaceColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*ActionBar actionBar=((AppCompatActivity)getActivity()).getSupportActionBar();
-                actionBar.setBackgroundDrawable(new ColorDrawable(0xff00DDED));
-                actionBar.setDisplayShowTitleEnabled(false);
-                actionBar.setDisplayShowTitleEnabled(true);*/
-
                 showChangeInterfaceColor();
             }
         });
         MobileAds.initialize(getContext(), new OnInitializationCompleteListener() {
             @Override
             public void onInitializationComplete(InitializationStatus initializationStatus) {
-                mAdView = view.findViewById(R.id.adView);
-                AdRequest adRequest = new AdRequest.Builder().build();
-                mAdView.loadAd(adRequest);
             }
         });
 
-        if(account!=null){
-            Glide.with(getContext()).load(account.getPhotoUrl()).into(im_userPhoto);
-            tx_userName.setText(account.getDisplayName());
+        if(SharedPrefUser.getInstance(getContext()).isLoggedIn()){
+            UserSharedPref userSharedPref=SharedPrefUser.getInstance(getContext()).getUser();
+            if(userSharedPref.isFullVersion()==false){
+                mAdView = view.findViewById(R.id.adView);
+                AdRequest adRequest = new AdRequest.Builder().build();
+                mAdView.loadAd(adRequest);
+            } else {
+                mAdView.setVisibility(View.GONE);
+                ll_removeAds.setVisibility(View.GONE);
+            }
+            Glide.with(getContext()).load(Uri.parse(userSharedPref.getImageCompressPath())).into(im_userPhoto);
+            tx_userName.setText(userSharedPref.getName());
             im_log.setImageResource(R.drawable.ic_logout);
             tx_log.setText(getResources().getString(R.string.sign_out));
             tx_userName.setVisibility(View.VISIBLE);
             im_userPhoto.setVisibility(View.VISIBLE);
+            ll_chUserPhoto.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(Intent.ACTION_PICK);
+                    intent.setType("image/*");
+                    String[] mimeTypes = {"image/jpeg", "image/png"};
+                    intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+                    startActivityForResult(intent, galleryRequestCode);
+                }
+            });
+            ll_chUserName.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    chUserName=new Dialog(getActivity());
+                    chUserName.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    chUserName.setContentView(R.layout.dialog_edittext);
+                    newUserName=(EditText) chUserName.findViewById(R.id.editUserName);
+                    newUserName.setText(SharedPrefUser.getUserName());
+                    save= (Button) chUserName.findViewById(R.id.buttonSave);
+                    save.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    final String temp = newUserName.getText().toString();
+                                                    db.collection("user")
+                                                            .document(SharedPrefUser.getUserId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                        @Override
+                                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                                UserModel userModel = documentSnapshot.toObject(UserModel.class);
+                                                                userModel.setName(temp);
+                                                                db.collection("user").document(SharedPrefUser.getUserId()).set(userModel);
+                                                                SharedPrefUser.getInstance(getContext()).setUserName(temp);
+                                                                tx_userName.setText(temp);
+                                                                chUserName.dismiss();
+                                                        }
+                                                    });
+                                                }
+                                            });
+                    chUserName.show();
+                }
+            });
             ll_log.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    /*getActivity().getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.fragmentContainer, authenticationFragment)
-                            .commit();*/
-                    mGoogleSignInClient.signOut();
-                    Toast.makeText(getActivity(), "You are Logged Out", Toast.LENGTH_SHORT).show();
-                    im_log.setImageResource(R.drawable.ic_login);
-                    tx_log.setText(getResources().getString(R.string.sign_in));
-                    tx_userName.setVisibility(View.GONE);
-                    im_userPhoto.setVisibility(View.GONE);
+                   signOut();
                 }
             });
         } else {
+            mAdView = view.findViewById(R.id.adView);
+            AdRequest adRequest = new AdRequest.Builder().build();
+            mAdView.loadAd(adRequest);
+            ll_chUserName.setVisibility(View.GONE);
+            ll_chUserPhoto.setVisibility(View.GONE);
             ll_log.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     signIn();
                 }
             });
+            ll_removeAds.setVisibility(View.GONE);
         }
         mainActivity = (MainActivity) getActivity();
         context = getActivity();
-        //Toast.makeText(context,mainActivity.getCostam(),Toast.LENGTH_LONG).show();
         return view;
     }
 
+    private void buyFullVersion(){
+        PayPalPayment payPalPayment=new PayPalPayment(new BigDecimal(5),"PLN",getResources().getString(R.string.fullVersion),PayPalPayment.PAYMENT_INTENT_SALE);
+        Intent intent=new Intent(getContext(), PaymentActivity.class);
+        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION,config);
+        intent.putExtra(PaymentActivity.EXTRA_PAYMENT,payPalPayment);
+        startActivityForResult(intent,PAYPAL_REQUEST_CODE);
+    }
+
+    private void signOut() {
+        mGoogleSignInClient.signOut();
+        SharedPrefUser.getInstance(getContext()).logout();
+        Toast.makeText(getActivity(), "You are Logged Out", Toast.LENGTH_SHORT).show();
+        im_log.setImageResource(R.drawable.ic_login);
+        tx_log.setText(getResources().getString(R.string.sign_in));
+        tx_userName.setVisibility(View.GONE);
+        im_userPhoto.setVisibility(View.GONE);
+        ll_chUserName.setVisibility(View.GONE);
+        ll_chUserPhoto.setVisibility(View.GONE);
+        ll_log.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signIn();
+            }
+        });
+    }
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -177,7 +293,101 @@ public class SettingsFragment extends Fragment{
             System.out.println("ELO?");
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
+        } else if(resultCode == RESULT_OK && requestCode==galleryRequestCode){
+            final ProgressDialog progressDialog
+                    = new ProgressDialog(getContext());
+            progressDialog.setMessage(getResources().getString(R.string.changePhoto));
+            progressDialog.show();
+            Uri selectedImage = data.getData();
+            Uri filePath = Uri.fromFile(new File(getRealPathFromURI(selectedImage)));
+            final String filename = filePath.getLastPathSegment();
+            Uri imageUri = data.getData();
+            String compressFileName = null;
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), imageUri);
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 60, baos);
+                byte[] compressedBitmap = baos.toByteArray();
+                compressFileName="c"+filename;
+                StorageReference riversRef = storage.getReference()
+                        .child("profilePhotos/" + compressFileName);
+                UploadTask uploadTask = riversRef.putBytes(compressedBitmap);
+                uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            StorageReference riversRef1 = storage.getReference()
+                    .child("profilePhotos/" + filename);
+            UploadTask uploadTask1 = riversRef1.putFile(filePath);
+            final String finalCompressFileName = compressFileName;
+            uploadTask1.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    StorageReference riversRef2 = storage.getReference();
+                    final String[] pathToImage = new String[1];
+                    final String[] pathToCompressedImage = new String[1];
+                    riversRef2.child("profilePhotos/"+filename).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            pathToImage[0] =uri.toString();
+                            StorageReference riversRef3 = storage.getReference();
+                            riversRef3.child("profilePhotos/"+ finalCompressFileName).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    pathToCompressedImage[0] =uri.toString();
+                                    UserSharedPref userSharedPref=SharedPrefUser.getInstance(getContext()).getUser();
+                                    userSharedPref.setImageCompressPath(pathToCompressedImage[0]);
+                                    userSharedPref.setImagePath(pathToImage[0]);
+                                    SharedPrefUser.getInstance(getContext()).userLogin(userSharedPref);
+                                    UserModel user=new UserModel(userSharedPref.getName(), pathToImage[0],pathToCompressedImage[0]);
+                                    db.collection("user").document(userSharedPref.getId()).set(user);
+                                    Glide.with(getContext()).load(pathToCompressedImage[0]).into(im_userPhoto);
+                                    progressDialog.dismiss();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        } else if(requestCode==PAYPAL_REQUEST_CODE){
+            if(resultCode==RESULT_OK){
+                PaymentConfirmation confirmation=data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
+                if(confirmation!=null){
+                    SharedPrefUser.getInstance(getContext()).setFullversion(true);
+                    UserSharedPref userSharedPref=SharedPrefUser.getInstance(getContext()).getUser();
+                    UserModel user=new UserModel(userSharedPref.getName(),userSharedPref.getImagePath(),userSharedPref.getImageCompressPath(),userSharedPref.isFullVersion());
+                    db.collection("user").document(userSharedPref.getId()).set(user);
+                    mAdView.setVisibility(View.GONE);
+                    ll_removeAds.setVisibility(View.GONE);
+                    Toast.makeText(getActivity(),getResources().getString(R.string.unlockFullVersion),Toast.LENGTH_LONG);
+                }
+            } else if(resultCode== Activity.RESULT_CANCELED) {
+                Toast.makeText(getContext(),"Cancel",Toast.LENGTH_SHORT).show();
+            }
+        } else if(resultCode== PaymentActivity.RESULT_EXTRAS_INVALID) {
+            Toast.makeText(getContext(), "Invalid", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private String getRealPathFromURI(Uri contentURI) {
+        String result;
+        Cursor cursor = getActivity().getContentResolver()
+                .query(contentURI, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            result = cursor.getString(idx);
+            cursor.close();
+        }
+        return result;
     }
 
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
@@ -228,13 +438,24 @@ public class SettingsFragment extends Fragment{
                     if(documentSnapshot.exists()) {
                         UserModel userModel = documentSnapshot.toObject(UserModel.class);
                         tx_userName.setText(userModel.getName());
-                        Glide.with(getContext()).load(userModel.getImagePath()).into(im_userPhoto);
+                        Glide.with(getContext()).load(userModel.getImageCompressPath()).into(im_userPhoto);
+                        UserSharedPref userSharedPref=new UserSharedPref(userModel.getName(),userModel.getImagePath(),userModel.getImageCompressPath(),fUser.getUid(),userModel.isFullVersion());
+                        SharedPrefUser.getInstance(getContext()).userLogin(userSharedPref);
+                        if(userSharedPref.isFullVersion()==true){
+                            mAdView.setVisibility(View.GONE);
+                            ll_removeAds.setVisibility(View.GONE);
+                        } else {
+                            ll_removeAds.setVisibility(View.VISIBLE);
+                        }
 
                     } else {
-                        UserModel user=new UserModel(account.getDisplayName(),account.getPhotoUrl().toString());
+                        UserModel user=new UserModel(account.getDisplayName(),"null",account.getPhotoUrl().toString());
                         db.collection("user").document(fUser.getUid()).set(user);
                         Glide.with(getContext()).load(account.getPhotoUrl()).into(im_userPhoto);
                         tx_userName.setText(account.getDisplayName());
+                        UserSharedPref userSharedPref=new UserSharedPref(account.getDisplayName(),"null",account.getPhotoUrl().toString(),fUser.getUid(),false);
+                        SharedPrefUser.getInstance(getContext()).userLogin(userSharedPref);
+                        ll_removeAds.setVisibility(View.VISIBLE);
                         }
                     }
                 });
@@ -243,15 +464,13 @@ public class SettingsFragment extends Fragment{
             tx_log.setText(getResources().getString(R.string.sign_out));
             tx_userName.setVisibility(View.VISIBLE);
             im_userPhoto.setVisibility(View.VISIBLE);
+            ll_chUserName.setVisibility(View.VISIBLE);
+            ll_chUserPhoto.setVisibility(View.VISIBLE);
+            ll_removeAds.setVisibility(View.VISIBLE);
             ll_log.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mGoogleSignInClient.signOut();
-                    Toast.makeText(getActivity(), "You are Logged Out", Toast.LENGTH_SHORT).show();
-                    im_log.setImageResource(R.drawable.ic_login);
-                    tx_log.setText(getResources().getString(R.string.sign_in));
-                    tx_userName.setVisibility(View.GONE);
-                    im_userPhoto.setVisibility(View.GONE);
+                    signOut();
                 }
             });
         }

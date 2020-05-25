@@ -5,8 +5,15 @@
     <string name="sign_out">Sign Out</string>
     <string name="ch_language">Change Language</string>
     <string name="ch_interface_color">Change Interface Color</string>
+    <string name="ch_userName">Change user name</string>
+    <string name="ch_userPhoto">Change user photo</string>
     <string name="chats">Chats</string>
     <string name="contacts">Contacts</string>
     <string name="Settings">Settings</string>
-
+    <string name="ch_userNameE">Enter a new username</string>
+    <string name="save">Save</string>
+    <string name="changePhoto">Photo change in progress</string>
+    <string name="removeAds">Buy version without ads</string>
+    <string name="fullVersion">Pełna wersja</string>
+    <string name="unlockFullVersion">Version without ads unlocked</string>
 </resources>
