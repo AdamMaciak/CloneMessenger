@@ -2,11 +2,48 @@ package com.example.clonemessenger.Models;
 
 import android.net.Uri;
 
+import java.util.Date;
+
 public class UserModel {
     String name;
     String imagePath;
     String imageCompressPath;
     boolean fullVersion;
+    boolean isOnline;
+    Date lastOnline;
+
+    public Date getLastOnline() {
+        return lastOnline;
+    }
+
+    public UserModel(String name, String imagePath, String imageCompressPath, boolean fullVersion, boolean isOnline, Date lastOnline) {
+        this.name = name;
+        this.imagePath = imagePath;
+        this.imageCompressPath = imageCompressPath;
+        this.fullVersion = fullVersion;
+        this.isOnline = isOnline;
+        this.lastOnline = lastOnline;
+    }
+
+    public void setLastOnline(Date lastOnline) {
+        this.lastOnline = lastOnline;
+    }
+
+    public boolean isOnline() {
+        return isOnline;
+    }
+
+    public void setOnline(boolean online) {
+        isOnline = online;
+    }
+
+    public UserModel(String name, String imagePath, String imageCompressPath, boolean fullVersion, boolean isOnline) {
+        this.name = name;
+        this.imagePath = imagePath;
+        this.imageCompressPath = imageCompressPath;
+        this.fullVersion = fullVersion;
+        this.isOnline = isOnline;
+    }
 
     public UserModel() {
     }

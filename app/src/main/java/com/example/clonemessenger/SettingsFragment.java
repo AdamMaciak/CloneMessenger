@@ -83,6 +83,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
@@ -264,6 +266,12 @@ public class SettingsFragment extends Fragment{
 
     private void signOut() {
         mGoogleSignInClient.signOut();
+
+        Date currentTime = Calendar.getInstance().getTime();
+        UserSharedPref userSharedPref=SharedPrefUser.getInstance(getContext()).getUser();
+        UserModel user=new UserModel(userSharedPref.getName(), userSharedPref.getImagePath(),userSharedPref.getImageCompressPath(),userSharedPref.isFullVersion(),false,currentTime);
+        db.collection("user").document(userSharedPref.getId()).set(user);
+
         SharedPrefUser.getInstance(getContext()).logout();
         Toast.makeText(getActivity(), "You are Logged Out", Toast.LENGTH_SHORT).show();
         im_log.setImageResource(R.drawable.ic_login);
@@ -344,7 +352,7 @@ public class SettingsFragment extends Fragment{
                                     userSharedPref.setImageCompressPath(pathToCompressedImage[0]);
                                     userSharedPref.setImagePath(pathToImage[0]);
                                     SharedPrefUser.getInstance(getContext()).userLogin(userSharedPref);
-                                    UserModel user=new UserModel(userSharedPref.getName(), pathToImage[0],pathToCompressedImage[0]);
+                                    UserModel user=new UserModel(userSharedPref.getName(), pathToImage[0],pathToCompressedImage[0],userSharedPref.isFullVersion(),true);
                                     db.collection("user").document(userSharedPref.getId()).set(user);
                                     Glide.with(getContext()).load(pathToCompressedImage[0]).into(im_userPhoto);
                                     progressDialog.dismiss();
@@ -360,7 +368,7 @@ public class SettingsFragment extends Fragment{
                 if(confirmation!=null){
                     SharedPrefUser.getInstance(getContext()).setFullversion(true);
                     UserSharedPref userSharedPref=SharedPrefUser.getInstance(getContext()).getUser();
-                    UserModel user=new UserModel(userSharedPref.getName(),userSharedPref.getImagePath(),userSharedPref.getImageCompressPath(),userSharedPref.isFullVersion());
+                    UserModel user=new UserModel(userSharedPref.getName(),userSharedPref.getImagePath(),userSharedPref.getImageCompressPath(),userSharedPref.isFullVersion(),true);
                     db.collection("user").document(userSharedPref.getId()).set(user);
                     mAdView.setVisibility(View.GONE);
                     ll_removeAds.setVisibility(View.GONE);
@@ -436,6 +444,8 @@ public class SettingsFragment extends Fragment{
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                     if(documentSnapshot.exists()) {
                         UserModel userModel = documentSnapshot.toObject(UserModel.class);
+                        userModel.setOnline(true);
+                        db.collection("user").document(fUser.getUid()).set(userModel);
                         tx_userName.setText(userModel.getName());
                         Glide.with(getContext()).load(userModel.getImageCompressPath()).into(im_userPhoto);
                         UserSharedPref userSharedPref=new UserSharedPref(userModel.getName(),userModel.getImagePath(),userModel.getImageCompressPath(),fUser.getUid(),userModel.isFullVersion());
@@ -448,7 +458,7 @@ public class SettingsFragment extends Fragment{
                         }
 
                     } else {
-                        UserModel user=new UserModel(account.getDisplayName(),"null",account.getPhotoUrl().toString());
+                        UserModel user=new UserModel(account.getDisplayName(),"null",account.getPhotoUrl().toString(),false,true);
                         db.collection("user").document(fUser.getUid()).set(user);
                         Glide.with(getContext()).load(account.getPhotoUrl()).into(im_userPhoto);
                         tx_userName.setText(account.getDisplayName());
