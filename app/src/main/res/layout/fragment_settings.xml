@@ -20,12 +20,12 @@
 
 
         <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/im_profilePhoto"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:visibility="gone" />
+            android:id="@+id/im_profilePhoto"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:visibility="gone" />
 
     <TextView
         android:id="@+id/tx_userName"

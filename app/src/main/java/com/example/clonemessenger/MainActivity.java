@@ -61,8 +61,8 @@ public class MainActivity extends AppCompatActivity {
                 setTheme(R.style.AppTheme);
                 break;
         }
-        ActionBar actionBar=getSupportActionBar();
-        actionBar.setTitle(getResources().getString(R.string.app_name));
+        /*ActionBar actionBar=getSupportActionBar();
+        actionBar.setTitle(getResources().getString(R.string.app_name));*/
         authenticationFragment = new AuthenticationFragment();
         openChatFragment = new OpenChatFragment();
 

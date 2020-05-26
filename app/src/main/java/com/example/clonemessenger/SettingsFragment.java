@@ -139,7 +139,7 @@ public class SettingsFragment extends Fragment{
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
         account = GoogleSignIn.getLastSignedInAccount(getContext());
-
+        mAdView = view.findViewById(R.id.adView);
         tx_userName=(TextView) view.findViewById(R.id.tx_userName);
         im_userPhoto=(ImageView) view.findViewById(R.id.im_profilePhoto);
         tx_log=(TextView) view.findViewById(R.id.tx_log);
@@ -177,7 +177,6 @@ public class SettingsFragment extends Fragment{
         if(SharedPrefUser.getInstance(getContext()).isLoggedIn()){
             UserSharedPref userSharedPref=SharedPrefUser.getInstance(getContext()).getUser();
             if(userSharedPref.isFullVersion()==false){
-                mAdView = view.findViewById(R.id.adView);
                 AdRequest adRequest = new AdRequest.Builder().build();
                 mAdView.loadAd(adRequest);
             } else {
