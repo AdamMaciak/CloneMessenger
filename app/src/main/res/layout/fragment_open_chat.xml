@@ -61,6 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Nazwa użytkownika"
+            android:textColor="#FFFFFF"
             android:textSize="20sp" />
 
         <ImageView

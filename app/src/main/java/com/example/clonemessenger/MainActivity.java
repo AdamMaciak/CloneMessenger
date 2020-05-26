@@ -69,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
             case "purple":
                 setTheme(R.style.AppTheme);
                 break;
+            default:
+                setTheme(R.style.AppTheme);
+                break;
         }
         /*ActionBar actionBar=getSupportActionBar();
         actionBar.setTitle(getResources().getString(R.string.app_name));*/
