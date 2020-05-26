@@ -88,6 +88,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.MODE_PRIVATE;
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class SettingsFragment extends Fragment{
@@ -123,6 +124,13 @@ public class SettingsFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        SharedPreferences preferences=getActivity().getSharedPreferences("Settings",MODE_PRIVATE);
+        String language= preferences.getString("Lang","");
+        Locale locale=new Locale(language);
+        Locale.setDefault(locale);
+        Configuration configuration=new Configuration();
+        configuration.locale=locale;
+        getResources().updateConfiguration(configuration,getResources().getDisplayMetrics());
         view = inflater.inflate(R.layout.fragment_settings, container, false);
 
         Intent intent= new Intent(getContext(),PayPalService.class);
@@ -510,7 +518,7 @@ public class SettingsFragment extends Fragment{
         Configuration configuration=new Configuration();
         configuration.locale=locale;
         getContext().getResources().updateConfiguration(configuration,getContext().getResources().getDisplayMetrics());
-        SharedPreferences.Editor editor= getContext().getSharedPreferences("Settings", Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor= getContext().getSharedPreferences("Settings", MODE_PRIVATE).edit();
         editor.putString("Lang",lang);
         editor.apply();
     }
@@ -521,7 +529,7 @@ public class SettingsFragment extends Fragment{
         mBuilder.setSingleChoiceItems(listItems, -1, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                SharedPreferences.Editor editor= getContext().getSharedPreferences("Settings", Context.MODE_PRIVATE).edit();
+                SharedPreferences.Editor editor= getContext().getSharedPreferences("Settings", MODE_PRIVATE).edit();
                 if(i==0){
                     editor.putString("ColorInterface","red");
                     editor.apply();

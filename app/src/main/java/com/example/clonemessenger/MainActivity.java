@@ -50,29 +50,32 @@ public class MainActivity extends AppCompatActivity {
 
    @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+       super.onCreate(savedInstanceState);
+       getLocale();
+       SharedPreferences preferences=getSharedPreferences("Settings",MODE_PRIVATE);
+       String colour= preferences.getString("ColorInterface","");
+       switch(colour) {
+           case "red":
+               setTheme(R.style.RedTheme);
+               break;
+           case "purple":
+               setTheme(R.style.AppTheme);
+               break;
+           default:
+               setTheme(R.style.AppTheme);
+       }
+
         setContentView(R.layout.activity_main);
-        getLocale();
+
         mContext=getApplicationContext();
         db = FirebaseFirestore.getInstance();
-        SharedPreferences preferences=getSharedPreferences("Settings",MODE_PRIVATE);
-        String colour= preferences.getString("ColorInterface","");
+
        MobileAds.initialize(this, new OnInitializationCompleteListener() {
            @Override
            public void onInitializationComplete(InitializationStatus initializationStatus) {
            }
        });
-        switch(colour) {
-            case "red":
-                setTheme(R.style.RedTheme);
-                break;
-            case "purple":
-                setTheme(R.style.AppTheme);
-                break;
-            default:
-                setTheme(R.style.AppTheme);
-                break;
-        }
+
         /*ActionBar actionBar=getSupportActionBar();
         actionBar.setTitle(getResources().getString(R.string.app_name));*/
         authenticationFragment = new AuthenticationFragment();
@@ -139,15 +142,12 @@ public class MainActivity extends AppCompatActivity {
     public String getCostam(){
         return "Udalo sie";
     }
-    private void setLocale(String lang) {
+    public void setLocale(String lang) {
         Locale locale=new Locale(lang);
         Locale.setDefault(locale);
         Configuration configuration=new Configuration();
         configuration.locale=locale;
         getResources().updateConfiguration(configuration,getResources().getDisplayMetrics());
-        SharedPreferences.Editor editor= getSharedPreferences("Settings", Context.MODE_PRIVATE).edit();
-        editor.putString("Lang",lang);
-        editor.apply();
 
     }
     public void getLocale(){
