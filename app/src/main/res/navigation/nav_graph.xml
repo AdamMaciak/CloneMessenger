@@ -16,7 +16,7 @@
         tools:layout="@layout/authentication_fragment" />
     <fragment
         android:id="@+id/chatsFragment"
-        android:name="com.example.clonemessenger.ChatsFragment"
+        android:name="com.example.clonemessenger.ListChatFragment"
         android:label="fragment_chats"
         tools:layout="@layout/fragment_chats" />
     <fragment

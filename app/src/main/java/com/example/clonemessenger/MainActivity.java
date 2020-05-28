@@ -1,18 +1,11 @@
 package com.example.clonemessenger;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
-import android.Manifest;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -23,8 +16,6 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Locale;
 
@@ -36,10 +27,12 @@ public class MainActivity extends AppCompatActivity {
 //    Button secondFragmentButton;
     AuthenticationFragment authenticationFragment;
     ContactFragment contactFragment;
-    ChatsFragment chatsFragment;
+    ListChatFragment listChatFragment;
     SettingsFragment settingsFragment;
     static public BottomNavigationView bottomBar;
     OpenChatFragment openChatFragment;
+
+
 
    @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         openChatFragment = new OpenChatFragment();
 
         contactFragment = new ContactFragment();
-        chatsFragment = new ChatsFragment();
+        listChatFragment = new ListChatFragment();
         settingsFragment = new SettingsFragment();
         //  Optional<GoogleSignInAccount> account= Optional.ofNullable(GoogleSignIn
         //  .getLastSignedInAccount(getApplicationContext()));
@@ -85,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                                 return true;
                             case R.id.action_chats:
                                 getSupportFragmentManager().beginTransaction()
-                                        .replace(R.id.fragmentContainer, chatsFragment)
+                                        .replace(R.id.fragmentContainer, listChatFragment)
                                         .commit();
                                 return true;
                             case R.id.action_settings:
@@ -124,9 +117,6 @@ public class MainActivity extends AppCompatActivity {
         return bottomBar;
     }
 
-    public String getCostam(){
-        return "Udalo sie";
-    }
     private void setLocale(String lang) {
         Locale locale=new Locale(lang);
         Locale.setDefault(locale);

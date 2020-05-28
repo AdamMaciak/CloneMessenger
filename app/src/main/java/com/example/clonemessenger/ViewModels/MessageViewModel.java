@@ -1,39 +1,15 @@
-package com.example.clonemessenger.Models;
+package com.example.clonemessenger.ViewModels;
 
 import java.util.Date;
 
-public class ChatModel {
+public class MessageViewModel {
     private String sender;
     private String receiver;
     private String message;
     private String image;
     private Date timeSend;
-
-    public ChatModel(String sender, String receiver, String message, String image, Date timeSend) {
-        this.sender = sender;
-        this.receiver = receiver;
-        this.message = message;
-        this.image = image;
-        this.timeSend = timeSend;
-    }
-
-    public Date getTimeSend() {
-        return timeSend;
-    }
-
-    public void setTimeSend(Date timeSend) {
-        this.timeSend = timeSend;
-    }
-
-    public ChatModel(String sender, String receiver, String message, String image) {
-        this.sender = sender;
-        this.receiver = receiver;
-        this.message = message;
-        this.image = image;
-    }
-
-    public ChatModel() {
-    }
+    private boolean isDeleted;
+    private boolean isImage;
 
     public String getSender() {
         return sender;
@@ -65,5 +41,29 @@ public class ChatModel {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public Date getTimeSend() {
+        return timeSend;
+    }
+
+    public void setTimeSend(Date timeSend) {
+        this.timeSend = timeSend;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    public boolean isImage() {
+        return isImage;
+    }
+
+    public void setImage(boolean image) {
+        isImage = image;
     }
 }

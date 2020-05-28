@@ -25,12 +25,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.clonemessenger.Adapters.ChatAdapter;
 import com.example.clonemessenger.Models.ChatModel;
+import com.example.clonemessenger.ViewModels.ListChatViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -53,8 +57,7 @@ import static androidx.constraintlayout.widget.Constraints.TAG;
 public class OpenChatFragment extends Fragment {
 
 
-    ChatsFragment chatsFragment;
-    ChatAdapter chatAdapter;
+    ListChatFragment listChatFragment;
     List<ChatModel> chat = new ArrayList<>();
     RecyclerView recyclerView;
     private ChatAdapter mAdapter;
@@ -70,7 +73,15 @@ public class OpenChatFragment extends Fragment {
     boolean take_photo = false;
     FirebaseStorage storage;
 
+    ListChatViewModel listChatViewModel;
+
     private String cameraFilePath = "";
+
+    public void setListChatViewModel(
+            ListChatViewModel listChatViewModel) {
+        this.listChatViewModel = listChatViewModel;
+    }
+
 
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -100,6 +111,7 @@ public class OpenChatFragment extends Fragment {
             }
         }
     }
+
     private void captureFromCamera() {
         try {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -119,18 +131,19 @@ public class OpenChatFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_open_chat, container, false);
         recyclerView = root.findViewById(R.id.rvChat);
         recyclerView.setHasFixedSize(true);
+
         final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
 //        System.out.println(account.getPhotoUrl());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setStackFromEnd(true);
-        chatsFragment = new ChatsFragment();
+        listChatFragment = new ListChatFragment();
 
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
                 getActivity().getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.fragmentContainer, chatsFragment)
+                        .replace(R.id.fragmentContainer, listChatFragment)
                         .commit();
                 //TODO temporary solution
                 MainActivity.getBottomBar().setVisibility(View.VISIBLE);
@@ -147,36 +160,8 @@ public class OpenChatFragment extends Fragment {
         userId = fUser.getUid();
         storage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();
-        db.collection("messages")
-                .document("Bqe17YUMVOc87njQktphxar85R63-cjvJnAr9dubyVrGZ7avyfAyaGFy1")
-                .collection("ChatModel")
-                .orderBy("timeSend")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value,
-                                        @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            Log.w(TAG, "Listen failed.", e);
-                            return;
-                        }
+        getDataFromFirestore();
 
-                        for (QueryDocumentSnapshot doc : value) {
-                            ChatModel city = doc.toObject(ChatModel.class);
-                            chat.add(city);
-                        }
-
-
-                        System.out.println("----------------------UWAGA");
-                        for (ChatModel ch : chat) {
-                            System.out.println(ch.getMessage() + "  " + ch.getSender());
-                        }
-                        //System.out.println(account.getPhotoUrl());
-//                        mAdapter = new ChatAdapter(getContext(), chat, account.getPhotoUrl());
-
-                        mAdapter = new ChatAdapter(getContext(), chat, null);
-                        recyclerView.setAdapter(mAdapter);
-                    }
-                });
         btn_sendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -316,6 +301,39 @@ public class OpenChatFragment extends Fragment {
         });
 
         return root;
+    }
+
+    private void getDataFromFirestore() {
+
+
+        db.collection("messages")
+                .document("Bqe17YUMVOc87njQktphxar85R63-cjvJnAr9dubyVrGZ7avyfAyaGFy1")
+                .collection("ChatModel")
+                .orderBy("timeSend")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value,
+                                        @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "Listen failed.", e);
+                            return;
+                        }
+
+                        for (QueryDocumentSnapshot doc : value) {
+                            ChatModel city = doc.toObject(ChatModel.class);
+                            chat.add(city);
+                        }
+
+                        System.out.println("----------------------UWAGA");
+                        for (ChatModel ch : chat) {
+                            System.out.println(ch.getMessage() + "  " + ch.getSender());
+                        }
+                        //System.out.println(account.getPhotoUrl());
+//                        mAdapter = new ChatAdapter(getContext(), chat, account.getPhotoUrl());
+                        mAdapter = new ChatAdapter(getContext(), chat, null);
+                        recyclerView.setAdapter(mAdapter);
+                    }
+                });
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

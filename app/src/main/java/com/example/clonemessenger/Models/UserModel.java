@@ -7,6 +7,24 @@ public class UserModel {
     String imagePath;
     String imageCompressPath;
     boolean fullVersion;
+    String desc;
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public UserModel(String name, String imagePath, String imageCompressPath, boolean fullVersion,
+                     String desc) {
+        this.name = name;
+        this.imagePath = imagePath;
+        this.imageCompressPath = imageCompressPath;
+        this.fullVersion = fullVersion;
+        this.desc = desc;
+    }
 
     public UserModel() {
     }

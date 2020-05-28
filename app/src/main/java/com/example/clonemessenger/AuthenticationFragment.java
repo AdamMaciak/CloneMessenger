@@ -72,8 +72,6 @@ public class AuthenticationFragment extends Fragment {
             }
         });
         return view;
-
-
     }
 
     private void signIn() {
