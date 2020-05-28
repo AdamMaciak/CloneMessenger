@@ -12,11 +12,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.clonemessenger.Models.UserModel;
+import com.example.clonemessenger.Models.UserSharedPref;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 
@@ -31,31 +38,39 @@ public class MainActivity extends AppCompatActivity {
     SettingsFragment settingsFragment;
     static public BottomNavigationView bottomBar;
     OpenChatFragment openChatFragment;
-
-
+    FirebaseFirestore db;
+    Context mContext;
 
    @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+       super.onCreate(savedInstanceState);
+       getLocale();
+       SharedPreferences preferences=getSharedPreferences("Settings",MODE_PRIVATE);
+       String colour= preferences.getString("ColorInterface","");
+       switch(colour) {
+           case "red":
+               setTheme(R.style.RedTheme);
+               break;
+           case "purple":
+               setTheme(R.style.AppTheme);
+               break;
+           default:
+               setTheme(R.style.AppTheme);
+       }
+
         setContentView(R.layout.activity_main);
-        getLocale();
-        SharedPreferences preferences=getSharedPreferences("Settings",MODE_PRIVATE);
-        String colour= preferences.getString("ColorInterface","");
+
+        mContext=getApplicationContext();
+        db = FirebaseFirestore.getInstance();
+
        MobileAds.initialize(this, new OnInitializationCompleteListener() {
            @Override
            public void onInitializationComplete(InitializationStatus initializationStatus) {
            }
        });
-        switch(colour) {
-            case "red":
-                setTheme(R.style.RedTheme);
-                break;
-            case "purple":
-                setTheme(R.style.AppTheme);
-                break;
-        }
-        ActionBar actionBar=getSupportActionBar();
-        actionBar.setTitle(getResources().getString(R.string.app_name));
+
+        /*ActionBar actionBar=getSupportActionBar();
+        actionBar.setTitle(getResources().getString(R.string.app_name));*/
         authenticationFragment = new AuthenticationFragment();
         openChatFragment = new OpenChatFragment();
 
@@ -132,5 +147,26 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences preferences=getSharedPreferences("Settings",MODE_PRIVATE);
         String language= preferences.getString("Lang","");
         setLocale(language);
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        if(SharedPrefUser.getInstance(mContext).isLoggedIn()==true){
+            UserSharedPref userSharedPref=SharedPrefUser.getInstance(mContext).getUser();
+            UserModel user=new UserModel(userSharedPref.getName(), userSharedPref.getImagePath(),userSharedPref.getImageCompressPath(),userSharedPref.isFullVersion(),true);
+            db.collection("user").document(userSharedPref.getId()).set(user);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(SharedPrefUser.getInstance(mContext).isLoggedIn()==true){
+            Date currentTime = Calendar.getInstance().getTime();
+            UserSharedPref userSharedPref=SharedPrefUser.getInstance(mContext).getUser();
+            UserModel user=new UserModel(userSharedPref.getName(), userSharedPref.getImagePath(),userSharedPref.getImageCompressPath(),userSharedPref.isFullVersion(),false,currentTime);
+            db.collection("user").document(userSharedPref.getId()).set(user);
+        }
     }
 }

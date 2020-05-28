@@ -13,9 +13,22 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.fragment.app.Fragment;
+
 import android.provider.MediaStore;
+import android.util.Config;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +36,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,9 +45,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.example.clonemessenger.Models.ChatModel;
 import com.example.clonemessenger.Models.UserModel;
 import com.example.clonemessenger.Models.UserSharedPref;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
@@ -52,7 +68,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.auth.User;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -69,6 +90,8 @@ import java.math.BigDecimal;
 import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.MODE_PRIVATE;
+import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class SettingsFragment extends Fragment{
     Button toLogin, save;
@@ -103,6 +126,13 @@ public class SettingsFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        SharedPreferences preferences=getActivity().getSharedPreferences("Settings",MODE_PRIVATE);
+        String language= preferences.getString("Lang","");
+        Locale locale=new Locale(language);
+        Locale.setDefault(locale);
+        Configuration configuration=new Configuration();
+        configuration.locale=locale;
+        getResources().updateConfiguration(configuration,getResources().getDisplayMetrics());
         view = inflater.inflate(R.layout.fragment_settings, container, false);
 
         Intent intent= new Intent(getContext(),PayPalService.class);
@@ -159,7 +189,6 @@ public class SettingsFragment extends Fragment{
         if(SharedPrefUser.getInstance(getContext()).isLoggedIn()){
             UserSharedPref userSharedPref=SharedPrefUser.getInstance(getContext()).getUser();
             if(userSharedPref.isFullVersion()==false){
-                mAdView = view.findViewById(R.id.adView);
                 AdRequest adRequest = new AdRequest.Builder().build();
                 mAdView.loadAd(adRequest);
             } else {
@@ -247,6 +276,12 @@ public class SettingsFragment extends Fragment{
 
     private void signOut() {
         mGoogleSignInClient.signOut();
+
+        Date currentTime = Calendar.getInstance().getTime();
+        UserSharedPref userSharedPref=SharedPrefUser.getInstance(getContext()).getUser();
+        UserModel user=new UserModel(userSharedPref.getName(), userSharedPref.getImagePath(),userSharedPref.getImageCompressPath(),userSharedPref.isFullVersion(),false,currentTime);
+        db.collection("user").document(userSharedPref.getId()).set(user);
+
         SharedPrefUser.getInstance(getContext()).logout();
         Toast.makeText(getActivity(), "You are Logged Out", Toast.LENGTH_SHORT).show();
         im_log.setImageResource(R.drawable.ic_login);
@@ -327,7 +362,7 @@ public class SettingsFragment extends Fragment{
                                     userSharedPref.setImageCompressPath(pathToCompressedImage[0]);
                                     userSharedPref.setImagePath(pathToImage[0]);
                                     SharedPrefUser.getInstance(getContext()).userLogin(userSharedPref);
-                                    UserModel user=new UserModel(userSharedPref.getName(), pathToImage[0],pathToCompressedImage[0]);
+                                    UserModel user=new UserModel(userSharedPref.getName(), pathToImage[0],pathToCompressedImage[0],userSharedPref.isFullVersion(),true);
                                     db.collection("user").document(userSharedPref.getId()).set(user);
                                     Glide.with(getContext()).load(pathToCompressedImage[0]).into(im_userPhoto);
                                     progressDialog.dismiss();
@@ -343,7 +378,7 @@ public class SettingsFragment extends Fragment{
                 if(confirmation!=null){
                     SharedPrefUser.getInstance(getContext()).setFullversion(true);
                     UserSharedPref userSharedPref=SharedPrefUser.getInstance(getContext()).getUser();
-                    UserModel user=new UserModel(userSharedPref.getName(),userSharedPref.getImagePath(),userSharedPref.getImageCompressPath(),userSharedPref.isFullVersion());
+                    UserModel user=new UserModel(userSharedPref.getName(),userSharedPref.getImagePath(),userSharedPref.getImageCompressPath(),userSharedPref.isFullVersion(),true);
                     db.collection("user").document(userSharedPref.getId()).set(user);
                     mAdView.setVisibility(View.GONE);
                     ll_removeAds.setVisibility(View.GONE);
@@ -419,6 +454,8 @@ public class SettingsFragment extends Fragment{
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                     if(documentSnapshot.exists()) {
                         UserModel userModel = documentSnapshot.toObject(UserModel.class);
+                        userModel.setOnline(true);
+                        db.collection("user").document(fUser.getUid()).set(userModel);
                         tx_userName.setText(userModel.getName());
                         Glide.with(getContext()).load(userModel.getImageCompressPath()).into(im_userPhoto);
                         UserSharedPref userSharedPref=new UserSharedPref(userModel.getName(),userModel.getImagePath(),userModel.getImageCompressPath(),fUser.getUid(),userModel.isFullVersion());
@@ -431,7 +468,7 @@ public class SettingsFragment extends Fragment{
                         }
 
                     } else {
-                        UserModel user=new UserModel(account.getDisplayName(),"null",account.getPhotoUrl().toString());
+                        UserModel user=new UserModel(account.getDisplayName(),"null",account.getPhotoUrl().toString(),false,true);
                         db.collection("user").document(fUser.getUid()).set(user);
                         Glide.with(getContext()).load(account.getPhotoUrl()).into(im_userPhoto);
                         tx_userName.setText(account.getDisplayName());
@@ -483,7 +520,7 @@ public class SettingsFragment extends Fragment{
         Configuration configuration=new Configuration();
         configuration.locale=locale;
         getContext().getResources().updateConfiguration(configuration,getContext().getResources().getDisplayMetrics());
-        SharedPreferences.Editor editor= getContext().getSharedPreferences("Settings", Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor= getContext().getSharedPreferences("Settings", MODE_PRIVATE).edit();
         editor.putString("Lang",lang);
         editor.apply();
     }
@@ -494,7 +531,7 @@ public class SettingsFragment extends Fragment{
         mBuilder.setSingleChoiceItems(listItems, -1, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                SharedPreferences.Editor editor= getContext().getSharedPreferences("Settings", Context.MODE_PRIVATE).edit();
+                SharedPreferences.Editor editor= getContext().getSharedPreferences("Settings", MODE_PRIVATE).edit();
                 if(i==0){
                     editor.putString("ColorInterface","red");
                     editor.apply();
