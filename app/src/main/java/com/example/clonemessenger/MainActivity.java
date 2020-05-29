@@ -1,9 +1,5 @@
 package com.example.clonemessenger;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -12,14 +8,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.clonemessenger.Models.UserModel;
 import com.example.clonemessenger.Models.UserSharedPref;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Calendar;
@@ -47,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
        getLocale();
        SharedPreferences preferences=getSharedPreferences("Settings",MODE_PRIVATE);
        String colour= preferences.getString("ColorInterface","");
-
        switch(colour) {
            case "red":
                setTheme(R.style.RedTheme);
@@ -128,6 +124,9 @@ public class MainActivity extends AppCompatActivity {
                         .commit();
             }
         });
+       getSupportFragmentManager().beginTransaction()
+               .replace(R.id.fragmentContainer, settingsFragment)
+               .commit();
     }
 
     static public BottomNavigationView getBottomBar() {

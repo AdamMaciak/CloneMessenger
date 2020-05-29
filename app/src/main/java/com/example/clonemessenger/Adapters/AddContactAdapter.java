@@ -1,6 +1,8 @@
 package com.example.clonemessenger.Adapters;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,16 +10,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.clonemessenger.Models.UserModel;
+import com.example.clonemessenger.Models.UserModelWithRef;
 import com.example.clonemessenger.Models.UserSharedPref;
 import com.example.clonemessenger.R;
 import com.example.clonemessenger.SharedPrefUser;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.auth.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +31,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AddContactAdapter extends RecyclerView.Adapter<AddContactAdapter.ViewHolder> {
 
-    List<UserModel> userModelList;
+    List<UserModelWithRef> userModelList;
     FirebaseFirestore db;
     UserSharedPref userSharedPref;
     Context ctx;
@@ -51,7 +54,9 @@ public class AddContactAdapter extends RecyclerView.Adapter<AddContactAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.userName.setText(userModelList.get(position).getName());
+        holder.userName.setText(userModelList.get(position).getUserModel().getName());
+        holder.userModelWithRef.setPathToDocument(userModelList.get(position).getPathToDocument());
+        holder.userModelWithRef.setUserModel(userModelList.get(position).getUserModel());
     }
 
     @Override
@@ -63,32 +68,38 @@ public class AddContactAdapter extends RecyclerView.Adapter<AddContactAdapter.Vi
 
         TextView userName;
         CircleImageView imageUser;
+        UserModelWithRef userModelWithRef;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             userName = itemView.findViewById(R.id.placeForUserName);
             imageUser = itemView.findViewById(R.id.imageUser);
+            userModelWithRef = new UserModelWithRef();
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    requestPermission(userModelWithRef.getPathToDocument());
                 }
             });
         }
     }
 
-    public void updateRecycleView(List<UserModel> listUserModels) {
+    public void updateRecycleView(List<UserModelWithRef> listUserModels) {
         userModelList.clear();
-        for (UserModel um :
+        for (UserModelWithRef um :
                 listUserModels) {
-            userModelList.add(new UserModel(um.getName(), um.getImagePath(),
-                    um.getImageCompressPath(), um.isFullVersion(), um.isOnline(),
-                    um.getLastOnline()));
+            userModelList.add(new UserModelWithRef(um.getPathToDocument(),
+                    new UserModel(um.getUserModel().getName(),
+                            um.getUserModel().getImagePath(),
+                            um.getUserModel().getImageCompressPath(),
+                            um.getUserModel().isFullVersion(), um.getUserModel().isOnline(),
+                            um.getUserModel().getLastOnline())));
         }
+
         notifyDataSetChanged();
     }
 
-    private void addContact(List<DocumentReference> referenceToContact) {
+    private void addContact(DocumentReference referenceToContact) {
         Map<String, Object> contacts = new HashMap<>();
         contacts.put("noteAboutThisPerson", "");
         contacts.put("refToUser", referenceToContact);
@@ -104,6 +115,25 @@ public class AddContactAdapter extends RecyclerView.Adapter<AddContactAdapter.Vi
                                 makeToast("User added");
                             }
                         });
+    }
+
+    private void requestPermission(String reference) {
+        new AlertDialog.Builder(ctx)
+                .setTitle("Chcesz dodać tego użytkownika?")
+                .setPositiveButton("Tak", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        DocumentReference ds = db.document(reference);
+                        addContact(ds);
+                    }
+                })
+                .setNegativeButton("Nie", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ((AppCompatActivity) ctx).finish();
+                    }
+                })
+                .create().show();
     }
 
     public void makeToast(String word) {

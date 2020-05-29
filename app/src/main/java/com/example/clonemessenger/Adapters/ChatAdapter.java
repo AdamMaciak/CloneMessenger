@@ -32,13 +32,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     private List<ChatModel> mChat;
     private Uri profilePhotoUrl;
     FirebaseUser fUser;
-    FirebaseStorage storage= FirebaseStorage.getInstance();
+    FirebaseStorage storage = FirebaseStorage.getInstance();
 
     public ChatAdapter(Context mContext, List<ChatModel> mChat, Uri profilePhotoUrl) {
         this.mChat = mChat;
         this.mContext = mContext;
         this.profilePhotoUrl = profilePhotoUrl;
-        fUser= FirebaseAuth.getInstance().getCurrentUser();
+        fUser = FirebaseAuth.getInstance().getCurrentUser();
     }
 
     @NonNull
@@ -55,27 +55,31 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull final ChatAdapter.ViewHolder holder, int position) {
-        final ChatModel chat=mChat.get(position);
+        final ChatModel chat = mChat.get(position);
         //System.out.println(fUser);
-        if(!fUser.getUid().equals(chat.getSender())) {
+        if (!fUser.getUid().equals(chat.getSender())) {
             Glide.with(mContext).load(profilePhotoUrl).into(holder.profile_image);
         }
-        if(!chat.getImage().equals("")){
+        if (!chat.getImage().equals("")) {
             holder.show_image.setVisibility(View.VISIBLE);
-            storage.getReference().child("images/"+chat.getImage()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    Glide.with(mContext).asBitmap()
-                            .fitCenter().load(uri).into(holder.show_image);
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle any errors
-                }
-            });
+            storage.getReference()
+                    .child("images/" + chat.getImage())
+                    .getDownloadUrl()
+                    .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            Glide.with(mContext).asBitmap()
+                                    .fitCenter().load(uri).into(holder.show_image);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle any errors
+                        }
+                    });
         }
-        if(!chat.getMessage().equals("")) {
+        if (!chat.getMessage().equals("")) {
             holder.show_message.setVisibility(View.VISIBLE);
             holder.show_message.setText(chat.getMessage());
         }
@@ -101,7 +105,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(mContext,"AAAAAAAAAAAAAAAAAAAAAAAAAAAA", LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "AAAAAAAAAAAAAAAAAAAAAAAAAAAA", LENGTH_SHORT).show();
                 }
             });
         }
@@ -110,9 +114,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     @Override
     public int getItemViewType(int position) {
         System.out.println(fUser.getUid());
-        System.out.println("POSITION "+position);
+        System.out.println("POSITION " + position);
         System.out.println(mChat.get(position).getSender());
-        if(mChat.get(position).getSender().equals(fUser.getUid())){
+        if (mChat.get(position).getSender().equals(fUser.getUid())) {
             System.out.println("-----------RIGHT");
             return msg_right;
         } else {
