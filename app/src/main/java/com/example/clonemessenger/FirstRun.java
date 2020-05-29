@@ -12,12 +12,16 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+import com.example.clonemessenger.Models.UserModel;
+import com.example.clonemessenger.Models.UserSharedPref;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -25,12 +29,15 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +57,9 @@ public class FirstRun extends Fragment {
     ArrayAdapter arrayLanguage, arrayTheme;
     List<String> languageList=new ArrayList<>();
     List<String> themeList=new ArrayList<>();
+    TextView tx1;
+    Button save;
+    FirebaseFirestore db;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -63,8 +73,33 @@ public class FirstRun extends Fragment {
         configuration.locale=locale;
         getResources().updateConfiguration(configuration,getResources().getDisplayMetrics());
         View view = inflater.inflate(R.layout.fragment_first_run, container, false);
+        db = FirebaseFirestore.getInstance();
         signInButton = view.findViewById(R.id.sign_in);
+        save=(Button) view.findViewById(R.id.btnSave);
+        tx1=(TextView) view.findViewById(R.id.textView7);
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(
+                getContext().getApplicationContext());
+        if(account!=null){
+            signInButton.setVisibility(View.GONE);
+            save.setVisibility(View.VISIBLE);
+            tx1.setText(getResources().getString(R.string.welcome1)+" "+SharedPrefUser.getUserName());
+        }
+
+
         mAuth = FirebaseAuth.getInstance();
+
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences.Editor editor= getContext().getSharedPreferences("Settings", MODE_PRIVATE).edit();
+                editor.putBoolean("firstStart",false);
+                editor.apply();
+                MainActivity.bottomBar.setVisibility(View.VISIBLE);
+                ListChatFragment listChatFragment=new ListChatFragment();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
+                        listChatFragment).commit();
+            }
+        });
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(
                 GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -75,9 +110,12 @@ public class FirstRun extends Fragment {
         mGoogleSignInClient = GoogleSignIn.getClient(getContext(), gso);
 
 
+        languageList.add(getResources().getString(R.string.english));
+        languageList.add(getResources().getString(R.string.polish));
+        themeList.add(getResources().getString(R.string.purple));
+        themeList.add(getResources().getString(R.string.red));
 
-        languageList.add("English");
-        languageList.add("Polish");
+
         spinnerLanguage=(Spinner) view.findViewById(R.id.spinner);
         spinnerTheme=(Spinner) view.findViewById(R.id.spinner2);
         arrayLanguage = new ArrayAdapter(getContext().getApplicationContext(), R.layout.spinner_item, languageList);
@@ -89,8 +127,7 @@ public class FirstRun extends Fragment {
             spinnerLanguage.setSelection(1);
         }
 
-        themeList.add("Purple");
-        themeList.add("Red");
+
         arrayTheme = new ArrayAdapter(getContext().getApplicationContext(), R.layout.spinner_item, themeList);
         arrayTheme.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerTheme.setAdapter(arrayTheme);
@@ -99,8 +136,8 @@ public class FirstRun extends Fragment {
         } else if(color.equals("red")){
             spinnerTheme.setSelection(1);
         }
-        int currentSelectTheme = spinnerTheme.getSelectedItemPosition();
-        int currentSelectLanguage = spinnerLanguage.getSelectedItemPosition();
+        final int currentSelectTheme = spinnerTheme.getSelectedItemPosition();
+        final int currentSelectLanguage = spinnerLanguage.getSelectedItemPosition();
 
         spinnerLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -204,17 +241,35 @@ public class FirstRun extends Fragment {
         }
     }
 
-    private void updateUI(FirebaseUser fUser) {
-        btnSignOut.setVisibility(View.VISIBLE);
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(
+    private void updateUI(final FirebaseUser fUser) {
+        final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(
                 getContext().getApplicationContext());
         if (account != null) {
-            String personName = account.getDisplayName();
-            String personEmail = account.getEmail();
-            Toast.makeText(getContext(), personName + personEmail, Toast.LENGTH_SHORT).show();
-        }
+            db.collection("user")
+                    .document(fUser.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    if (documentSnapshot.exists()) {
+                        UserModel userModel = documentSnapshot.toObject(UserModel.class);
+                        userModel.setOnline(true);
+                        db.collection("user").document(fUser.getUid()).set(userModel);
+                        tx1.setText(getResources().getString(R.string.welcome1) + " " + userModel.getName());
+                        UserSharedPref userSharedPref = new UserSharedPref(userModel.getName(), userModel.getImagePath(), userModel.getImageCompressPath(), fUser.getUid(), userModel.isFullVersion());
+                        SharedPrefUser.getInstance(getContext()).userLogin(userSharedPref);
 
-    }
+                    } else {
+                        UserModel user = new UserModel(account.getDisplayName(), "null", account.getPhotoUrl().toString(), false, true);
+                        db.collection("user").document(fUser.getUid()).set(user);
+                        tx1.setText(getResources().getString(R.string.welcome1) + " " + account.getDisplayName());
+                        UserSharedPref userSharedPref = new UserSharedPref(account.getDisplayName(), "null", account.getPhotoUrl().toString(), fUser.getUid(), false);
+                        SharedPrefUser.getInstance(getContext()).userLogin(userSharedPref);
+                    }
+                }
+            });
+            signInButton.setVisibility(View.GONE);
+            save.setVisibility(View.VISIBLE);
+        }
+        }
     private void setLocate(String lang) {
         Locale locale=new Locale(lang);
         Locale.setDefault(locale);

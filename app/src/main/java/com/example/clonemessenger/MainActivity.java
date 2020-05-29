@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
        boolean fStart=preferences.getBoolean("firstStart",true);
 
        getLocale();
-       String colour= preferences.getString("ColorInterface","");
+       String colour= preferences.getString("ColorInterface","purple");
        switch(colour) {
            case "red":
                setTheme(R.style.RedTheme);
@@ -84,9 +84,12 @@ public class MainActivity extends AppCompatActivity {
            bottomBar.setVisibility(View.GONE);
            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
                    firstRun).commit();
-       } else {
-           getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
-                   listChatFragment).commit();
+       }else {
+           if(!SharedPrefUser.getInstance(getApplicationContext()).isLoggedIn()){
+               bottomBar.setVisibility(View.GONE);
+               getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
+                       settingsFragment).commit();
+           }
        }
         bottomBar.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -153,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void getLocale(){
         SharedPreferences preferences=getSharedPreferences("Settings",MODE_PRIVATE);
-        String language= preferences.getString("Lang","");
+        String language= preferences.getString("Lang","en");
         setLocale(language);
     }
 

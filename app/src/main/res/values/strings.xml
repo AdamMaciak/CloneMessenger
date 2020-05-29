@@ -14,6 +14,15 @@
     <string name="save">Save</string>
     <string name="changePhoto">Photo change in progress</string>
     <string name="removeAds">Buy version without ads</string>
-    <string name="fullVersion">Pełna wersja</string>
+    <string name="fullVersion">Full version</string>
     <string name="unlockFullVersion">Version without ads unlocked</string>
+    <string name="english">English</string>
+    <string name="polish">Polish</string>
+    <string name="red">Red</string>
+    <string name="purple">Purple</string>
+    <string name="chooseL">Choose language</string>
+    <string name="chooseC">Choose theme color</string>
+    <string name="loginToUse">Log in to be able to use the application</string>
+    <string name="welcome">Welcome in CloneMessanger App</string>
+    <string name="welcome1">Welcome</string>
 </resources>

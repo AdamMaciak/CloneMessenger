@@ -15,6 +15,15 @@
     <string name="save">Zapisz</string>
     <string name="changePhoto">Trwa zmiana zdjęcia</string>
     <string name="removeAds">Kup wersję bez reklam</string>
-    <string name="fullVersion">Full version</string>
+    <string name="fullVersion">Pełna wersja</string>
     <string name="unlockFullVersion">Odblokowano wersję bez reklam</string>
+    <string name="english">Angielski</string>
+    <string name="polish">Polski</string>
+    <string name="red">Czerwony</string>
+    <string name="purple">Fioletowy</string>
+    <string name="chooseL">Wybierz język</string>
+    <string name="chooseC">Wybierz kolor motywu</string>
+    <string name="loginToUse">Zaloguj się aby móc korzystać z aplikacji</string>
+    <string name="welcome">Witamy w aplikacji Clone Messanger</string>
+    <string name="welcome1">Witaj</string>
 </resources>

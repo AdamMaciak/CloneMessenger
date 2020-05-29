@@ -279,7 +279,7 @@ public class SettingsFragment extends Fragment{
 
     private void signOut() {
         mGoogleSignInClient.signOut();
-
+        MainActivity.bottomBar.setVisibility(View.GONE);
         Date currentTime = Calendar.getInstance().getTime();
         UserSharedPref userSharedPref=SharedPrefUser.getInstance(getContext()).getUser();
         UserModel user=new UserModel(userSharedPref.getName(), userSharedPref.getImagePath(),userSharedPref.getImageCompressPath(),userSharedPref.isFullVersion(),false,currentTime);
@@ -481,6 +481,7 @@ public class SettingsFragment extends Fragment{
                         }
                     }
                 });
+            MainActivity.bottomBar.setVisibility(View.VISIBLE);
             }
             im_log.setImageResource(R.drawable.ic_logout);
             tx_log.setText(getResources().getString(R.string.sign_out));
@@ -497,9 +498,9 @@ public class SettingsFragment extends Fragment{
             });
         }
     public void showChangeLanguangeDialog(){
-        final String[] listItems={"English","Polish"};
+        final String[] listItems={getResources().getString(R.string.english),getResources().getString(R.string.polish)};
         AlertDialog.Builder mBuilder= new AlertDialog.Builder(getContext());
-        mBuilder.setTitle("Change Language");
+        mBuilder.setTitle(getResources().getString(R.string.chooseL));
         mBuilder.setSingleChoiceItems(listItems, -1, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -529,9 +530,9 @@ public class SettingsFragment extends Fragment{
     }
 
     public void showChangeInterfaceColor(){
-        final String[] listItems={"Czerwony","Fioletowy"};
+        final String[] listItems={getResources().getString(R.string.red),getResources().getString(R.string.purple)};
         AlertDialog.Builder mBuilder= new AlertDialog.Builder(getContext());
-        mBuilder.setTitle("Change Language");
+        mBuilder.setTitle(getResources().getString(R.string.chooseC));
         mBuilder.setSingleChoiceItems(listItems, -1, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
