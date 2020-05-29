@@ -95,7 +95,6 @@ public class AddContactAdapter extends RecyclerView.Adapter<AddContactAdapter.Vi
                             um.getUserModel().isFullVersion(), um.getUserModel().isOnline(),
                             um.getUserModel().getLastOnline())));
         }
-
         notifyDataSetChanged();
     }
 

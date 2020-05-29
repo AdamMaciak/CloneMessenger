@@ -82,6 +82,7 @@ public class AddContactFragment extends Fragment {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                makeToast("click button");
                 db.collection("user").get()
                         .addOnSuccessListener(
                                 new OnSuccessListener<QuerySnapshot>() {
@@ -106,7 +107,7 @@ public class AddContactFragment extends Fragment {
                                 });
             }
         });
-        return inflater.inflate(R.layout.fragment_add_contact, container, false);
+        return v;
     }
 
     private List<UserModelWithRef> sortByName(List<UserModelWithRef> toSort, String name) {

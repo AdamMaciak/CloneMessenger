@@ -1,7 +1,5 @@
 package com.example.clonemessenger.Models;
 
-import com.google.firebase.firestore.DocumentReference;
-
 //Tylko dla ekranu dodawnia uzytkownika
 
 public class UserModelWithRef {
