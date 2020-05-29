@@ -9,8 +9,6 @@ public class ListChatViewModel{
     private String imageChatPath;
     private String lastMessageDate;
     private String idChat;
-    private String refToChat;
-
 
     public
     ListChatViewModel() {

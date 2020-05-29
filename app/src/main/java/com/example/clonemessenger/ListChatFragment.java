@@ -84,6 +84,8 @@ public class ListChatFragment extends Fragment {
         recyclerView.setLayoutManager(linearLayoutManager);
         listChatAdapter = new ListChatAdapter();
         recyclerView.setAdapter(listChatAdapter);
+
+
         ctx = getContext();
         tasks = new ArrayList<>();
         userSharedPref = SharedPrefUser.getInstance(getContext()).getUser();
@@ -135,11 +137,14 @@ public class ListChatFragment extends Fragment {
                                                 documentSnapshot.toObject(
                                                         ListChatModel.class);
                                         listChatModels.add(listChatModel);
-                                        listChatViewModels.add(
-                                                new ListChatViewModel(listChatModel.getTitle(),
-                                                        LastMessage, listChatModel.getImageChat(),
-                                                        LastMessageDate.toString(),
-                                                        documentSnapshot.getId()));
+                                        if (listChatModel != null) {
+                                            listChatViewModels.add(
+                                                    new ListChatViewModel(listChatModel.getTitle(),
+                                                            LastMessage,
+                                                            listChatModel.getImageChat(),
+                                                            LastMessageDate.toString(),
+                                                            documentSnapshot.getId()));
+                                        }
                                     }
                                 }));
                     }

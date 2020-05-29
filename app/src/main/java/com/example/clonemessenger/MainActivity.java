@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
        getLocale();
        SharedPreferences preferences=getSharedPreferences("Settings",MODE_PRIVATE);
        String colour= preferences.getString("ColorInterface","");
+
        switch(colour) {
            case "red":
                setTheme(R.style.RedTheme);
@@ -80,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         //  Optional<GoogleSignInAccount> account= Optional.ofNullable(GoogleSignIn
         //  .getLastSignedInAccount(getApplicationContext()));
         bottomBar = findViewById(R.id.bottomBar);
+
 
         bottomBar.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {

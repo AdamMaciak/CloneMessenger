@@ -17,7 +17,7 @@ public class AddChatFragment extends Fragment {
     AddChatFragment addChatFragment;
     Bundle bundle;
     public AddChatFragment() {
-        // Required empty public constructor
+
     }
 
     @Override

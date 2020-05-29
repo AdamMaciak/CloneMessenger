@@ -7,9 +7,12 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:layout_margin="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:padding="1dp">
+        android:background="#2C98F0">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imageChat"

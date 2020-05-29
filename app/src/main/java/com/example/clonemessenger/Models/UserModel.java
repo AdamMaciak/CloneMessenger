@@ -16,7 +16,8 @@ public class UserModel {
         return lastOnline;
     }
 
-    public UserModel(String name, String imagePath, String imageCompressPath, boolean fullVersion, boolean isOnline, Date lastOnline) {
+    public UserModel(String name, String imagePath, String imageCompressPath, boolean fullVersion,
+                     boolean isOnline, Date lastOnline) {
         this.name = name;
         this.imagePath = imagePath;
         this.imageCompressPath = imageCompressPath;
@@ -37,7 +38,8 @@ public class UserModel {
         isOnline = online;
     }
 
-    public UserModel(String name, String imagePath, String imageCompressPath, boolean fullVersion, boolean isOnline) {
+    public UserModel(String name, String imagePath, String imageCompressPath, boolean fullVersion,
+                     boolean isOnline) {
         this.name = name;
         this.imagePath = imagePath;
         this.imageCompressPath = imageCompressPath;
@@ -97,4 +99,5 @@ public class UserModel {
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
     }
+
 }
