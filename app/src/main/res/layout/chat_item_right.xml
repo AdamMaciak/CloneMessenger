@@ -5,34 +5,62 @@
     android:layout_height="wrap_content"
     android:padding="8dp">
 
-    <RelativeLayout
-        android:layout_width="300dp"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true">
-
-        <ImageView
-            android:id="@+id/show_image"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:padding="8dp"
-            android:visibility="gone" />
+        android:layout_alignParentRight="true"
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/show_message"
+            android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/show_image"
+            android:layout_marginStart="40dp"
+
+            android:paddingTop="5dp"
+            android:layout_toLeftOf="@id/layout"
+            android:paddingRight="10dp"
+            android:text="12:22"
+            android:textColor="#555555"
+            android:textSize="14sp"
+            android:visibility="visible" />
+
+        <RelativeLayout
+
+            android:id="@+id/layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="0dp"
             android:background="@drawable/background_right"
-            android:padding="8dp"
-            android:textColor="#ffffff"
-            android:textSize="18sp"
-            android:visibility="gone"/>
-    </RelativeLayout>
+            android:clickable="true"
+            android:layout_gravity="right"
+            android:foreground="?android:attr/selectableItemBackground">
+
+            <ImageView
+                android:id="@+id/show_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:padding="8dp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/show_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/show_image"
+                android:layout_marginTop="0dp"
+                android:padding="8dp"
+                android:textColor="#ffffff"
+                android:textSize="18sp"
+                android:visibility="visible" />
+        </RelativeLayout>
+    </LinearLayout>
+
+
 
 </RelativeLayout>

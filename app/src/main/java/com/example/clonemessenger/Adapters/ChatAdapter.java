@@ -44,7 +44,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     @NonNull
     @Override
     public ChatAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if (viewType == msg_right) {
+        if (mChat.get(viewType).getSender().equals(fUser.getUid())) {
             View v = LayoutInflater.from(mContext).inflate(R.layout.chat_item_right, parent, false);
             return new ChatAdapter.ViewHolder(v);
         } else {
@@ -57,9 +57,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull final ChatAdapter.ViewHolder holder, int position) {
         final ChatModel chat = mChat.get(position);
         //System.out.println(fUser);
-        if (!fUser.getUid().equals(chat.getSender())) {
+        /*if(!fUser.getUid().equals(chat.getSender())) {
             Glide.with(mContext).load(profilePhotoUrl).into(holder.profile_image);
-        }
+        }*/
         if (!chat.getImage().equals("")) {
             holder.show_image.setVisibility(View.VISIBLE);
             storage.getReference()
@@ -84,6 +84,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             holder.show_message.setText(chat.getMessage());
         }
     }
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
 
     @Override
     public int getItemCount() {
@@ -113,15 +118,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        System.out.println(fUser.getUid());
-        System.out.println("POSITION " + position);
-        System.out.println(mChat.get(position).getSender());
-        if (mChat.get(position).getSender().equals(fUser.getUid())) {
-            System.out.println("-----------RIGHT");
-            return msg_right;
-        } else {
-            System.out.println("-------------LEFT");
-            return msg_left;
-        }
+        return position;
     }
 }

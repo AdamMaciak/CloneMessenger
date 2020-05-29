@@ -47,6 +47,7 @@
             android:theme="@style/Theme.MyApp" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recViewForContacts"
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:id="@+id/recViewForContacts"/>

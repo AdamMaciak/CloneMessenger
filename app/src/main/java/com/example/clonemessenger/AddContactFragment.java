@@ -2,11 +2,17 @@ package com.example.clonemessenger;
 
 import android.content.Context;
 import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.EditText;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,7 +23,13 @@ import com.example.clonemessenger.Models.UserModel;
 import com.example.clonemessenger.Models.UserModelWithRef;
 import com.example.clonemessenger.Models.UserSharedPref;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.example.clonemessenger.Adapters.AddContactAdapter;
+import com.example.clonemessenger.Adapters.ContactsAdapter;
+import com.example.clonemessenger.Models.UserSharedPref;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -46,6 +58,7 @@ public class AddContactFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        db = FirebaseFirestore.getInstance();
         db = FirebaseFirestore.getInstance();
         userSharedPref = SharedPrefUser.getInstance(getContext()).getUser();
         userModels = new ArrayList<>();
@@ -93,7 +106,7 @@ public class AddContactFragment extends Fragment {
                                 });
             }
         });
-        return v;
+        return inflater.inflate(R.layout.fragment_add_contact, container, false);
     }
 
     private List<UserModelWithRef> sortByName(List<UserModelWithRef> toSort, String name) {
