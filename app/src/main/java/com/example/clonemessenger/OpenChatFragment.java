@@ -6,11 +6,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -71,6 +73,8 @@ public class OpenChatFragment extends Fragment {
     Uri filePath;
     boolean selected_image = false;
     boolean take_photo = false;
+    private Parcelable recyclerViewState;
+    LinearLayoutManager linearLayoutManager;
     FirebaseStorage storage;
 
     private ListChatViewModel listChatViewModel;
@@ -139,7 +143,7 @@ public class OpenChatFragment extends Fragment {
 
         final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
 //        System.out.println(account.getPhotoUrl());
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setStackFromEnd(true);
         listChatFragment = new ListChatFragment();
 
@@ -157,6 +161,7 @@ public class OpenChatFragment extends Fragment {
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
 
         recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
         btn_sendMessage = root.findViewById(R.id.btn_sendMessage);
         btn_getFromGallery = root.findViewById(R.id.btn_getFromGallery);
         btn_takePhoto = root.findViewById(R.id.btn_takePhoto);
@@ -337,6 +342,8 @@ public class OpenChatFragment extends Fragment {
 //                        mAdapter = new ChatAdapter(getContext(), chat, account.getPhotoUrl());
                         mAdapter = new ChatAdapter(getContext(), chat, null);
                         recyclerView.setAdapter(mAdapter);
+                        mAdapter.notifyItemInserted(chat.size() - 1);
+                        linearLayoutManager.scrollToPosition(chat.size() - 1);
                     }
                 });
     }
