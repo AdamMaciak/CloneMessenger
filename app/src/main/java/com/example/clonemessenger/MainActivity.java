@@ -37,12 +37,16 @@ public class MainActivity extends AppCompatActivity {
     OpenChatFragment openChatFragment;
     FirebaseFirestore db;
     Context mContext;
+    FirstRun firstRun;
 
    @Override
     protected void onCreate(Bundle savedInstanceState) {
        super.onCreate(savedInstanceState);
-       getLocale();
+       firstRun = new FirstRun();
        SharedPreferences preferences=getSharedPreferences("Settings",MODE_PRIVATE);
+       boolean fStart=preferences.getBoolean("firstStart",true);
+
+       getLocale();
        String colour= preferences.getString("ColorInterface","");
        switch(colour) {
            case "red":
@@ -51,8 +55,6 @@ public class MainActivity extends AppCompatActivity {
            case "purple":
                setTheme(R.style.AppTheme);
                break;
-           default:
-               setTheme(R.style.AppTheme);
        }
 
         setContentView(R.layout.activity_main);
@@ -78,7 +80,14 @@ public class MainActivity extends AppCompatActivity {
         //  .getLastSignedInAccount(getApplicationContext()));
         bottomBar = findViewById(R.id.bottomBar);
 
-
+       if(fStart) {
+           bottomBar.setVisibility(View.GONE);
+           getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
+                   firstRun).commit();
+       } else {
+           getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
+                   listChatFragment).commit();
+       }
         bottomBar.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -124,9 +133,7 @@ public class MainActivity extends AppCompatActivity {
                         .commit();
             }
         });
-       getSupportFragmentManager().beginTransaction()
-               .replace(R.id.fragmentContainer, settingsFragment)
-               .commit();
+
     }
 
     static public BottomNavigationView getBottomBar() {
