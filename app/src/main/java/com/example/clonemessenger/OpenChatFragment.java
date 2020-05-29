@@ -73,13 +73,18 @@ public class OpenChatFragment extends Fragment {
     boolean take_photo = false;
     FirebaseStorage storage;
 
-    ListChatViewModel listChatViewModel;
+    private ListChatViewModel listChatViewModel;
 
     private String cameraFilePath = "";
 
     public void setListChatViewModel(
             ListChatViewModel listChatViewModel) {
-        this.listChatViewModel = listChatViewModel;
+        this.listChatViewModel = new ListChatViewModel();
+        this.listChatViewModel.setIdChat(listChatViewModel.getIdChat());
+        this.listChatViewModel.setImageChatPath(listChatViewModel.getImageChatPath());
+        this.listChatViewModel.setLastMessage(listChatViewModel.getLastMessage());
+        this.listChatViewModel.setTitle(listChatViewModel.getTitle());
+        this.listChatViewModel.setLastMessageDate(listChatViewModel.getLastMessageDate());
     }
 
 

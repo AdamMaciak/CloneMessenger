@@ -15,5 +15,11 @@
         <item name="android:navigationBarColor">#9A0C0C</item>
         <item name="colorAccent">#03DAC5</item>
     </style>
+    <style name="Theme.MyApp" parent="Theme.MaterialComponents">
+        <item name="colorPrimary">#6200EE</item>
+        <item name="colorPrimaryDark">#3700B3</item>
+        <item name="colorAccent">#03DAC5</item>
+        <item name="android:navigationBarColor">#3700B3</item>
+    </style>
 
 </resources>

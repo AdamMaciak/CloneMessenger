@@ -87,6 +87,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
@@ -189,6 +191,7 @@ public class SettingsFragment extends Fragment{
         if(SharedPrefUser.getInstance(getContext()).isLoggedIn()){
             UserSharedPref userSharedPref=SharedPrefUser.getInstance(getContext()).getUser();
             if(userSharedPref.isFullVersion()==false){
+                mAdView = view.findViewById(R.id.adView);
                 AdRequest adRequest = new AdRequest.Builder().build();
                 mAdView.loadAd(adRequest);
             } else {
@@ -524,6 +527,7 @@ public class SettingsFragment extends Fragment{
         editor.putString("Lang",lang);
         editor.apply();
     }
+
     public void showChangeInterfaceColor(){
         final String[] listItems={"Czerwony","Fioletowy"};
         AlertDialog.Builder mBuilder= new AlertDialog.Builder(getContext());

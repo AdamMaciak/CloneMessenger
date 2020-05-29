@@ -5,8 +5,18 @@ public class ListChatModel {
     private String imageChat;
     private boolean isDeleted;
     private boolean haveImage;
+    private String description;
 
     public ListChatModel() {
+    }
+
+    public ListChatModel(String title, String imageChat, boolean isDeleted, boolean haveImage,
+                         String description) {
+        this.title = title;
+        this.imageChat = imageChat;
+        this.isDeleted = isDeleted;
+        this.haveImage = haveImage;
+        this.description = description;
     }
 
     public ListChatModel(String title, String imageChat, boolean isDeleted, boolean haveImage) {
@@ -46,5 +56,13 @@ public class ListChatModel {
 
     public void setHaveImage(boolean haveImage) {
         this.haveImage = haveImage;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

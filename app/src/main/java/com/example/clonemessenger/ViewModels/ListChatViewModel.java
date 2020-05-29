@@ -1,6 +1,8 @@
 package com.example.clonemessenger.ViewModels;
 
-public class ListChatViewModel {
+import androidx.annotation.NonNull;
+
+public class ListChatViewModel{
 
     private String title;
     private String lastMessage;
@@ -9,8 +11,15 @@ public class ListChatViewModel {
     private String idChat;
     private String refToChat;
 
+
     public
     ListChatViewModel() {
+    }
+
+    @NonNull
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
     public ListChatViewModel(String title, String lastMessage, String imageChatPath,

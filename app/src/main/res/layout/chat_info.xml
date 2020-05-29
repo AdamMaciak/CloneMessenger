@@ -8,7 +8,8 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="1dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imageChat"
@@ -21,6 +22,7 @@
             android:id="@+id/titleChat"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
+            android:fontFamily="@font/roboto_mono_medium"
             android:text="titleChat"
             app:layout_constraintLeft_toRightOf="@id/imageChat"
             app:layout_constraintTop_toTopOf="parent" />
@@ -29,8 +31,9 @@
             android:id="@+id/lastMessage"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
+            android:fontFamily="@font/roboto_mono_medium"
             android:text="lastMessage"
-            app:layout_constraintTop_toBottomOf="@id/titleChat"
-            app:layout_constraintLeft_toRightOf="@id/imageChat"/>
+            app:layout_constraintLeft_toRightOf="@id/imageChat"
+            app:layout_constraintTop_toBottomOf="@id/titleChat" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

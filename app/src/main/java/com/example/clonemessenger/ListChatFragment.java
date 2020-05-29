@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import com.example.clonemessenger.ViewModels.ListChatViewModel;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.common.base.Optional;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseUser;
@@ -51,8 +53,6 @@ import java.util.Random;
 
 public class ListChatFragment extends Fragment {
 
-    private Button toChat;
-    private Button getRef;
     private OpenChatFragment openChatFragment;
     private int PERMISSION = 1000;
     private Context ctx;
@@ -65,12 +65,17 @@ public class ListChatFragment extends Fragment {
     List<ListChatViewModel> listChatViewModels;
     List<Task<DocumentSnapshot>> tasks;
 
+    UserSharedPref userSharedPref;
+
+    FloatingActionButton toAddChatFragment;
+
+    AddChatFragment addChatFragment;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
         db = FirebaseFirestore.getInstance();
-        getRef = view.findViewById(R.id.button3);
         listChatModels = new ArrayList<>();
         //RECYCLER VIEW INIT
         recyclerView = view.findViewById(R.id.recViewForListChat);
@@ -81,7 +86,9 @@ public class ListChatFragment extends Fragment {
         recyclerView.setAdapter(listChatAdapter);
         ctx = getContext();
         tasks = new ArrayList<>();
-        final UserSharedPref userSharedPref = SharedPrefUser.getInstance(getContext()).getUser();
+        userSharedPref = SharedPrefUser.getInstance(getContext()).getUser();
+
+        toAddChatFragment = view.findViewById(R.id.navigateToAddChatFragment);
 
         if (ContextCompat.checkSelfPermission(getContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
@@ -92,29 +99,9 @@ public class ListChatFragment extends Fragment {
             requestPermission();
         }
 
-        getRef.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Map<String, Object> dane = new HashMap<>();
-                dane.put("LastMessage", "wiadomosc do odczytania");
-                dane.put("LastMessageDate", Calendar.getInstance().getTime());
-                dane.put("ref", "");
-                db.collection("user")
-                        .document(userSharedPref.getId())
-                        .collection("refToChat")
-                        .add(dane)
-                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                            @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                makeToast("success");
-                            }
-                        });
-            }
-        });
-
         listChatViewModels = new ArrayList<>();
 
-
+        //TODO
         db.collection("user")
                 .document(userSharedPref.getId())
                 .collection("refToChat")
@@ -122,8 +109,14 @@ public class ListChatFragment extends Fragment {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots,
                                 @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w("FirestoreException", "Listen failed.", e);
+                    return;
+                }
+
                 List<DocumentSnapshot> documentSnapshots =
                         queryDocumentSnapshots.getDocuments();
+                listChatViewModels.clear();
                 listChatModels.clear();
                 for (DocumentSnapshot ds :
                         documentSnapshots) {
@@ -131,28 +124,62 @@ public class ListChatFragment extends Fragment {
                             ds.getDocumentReference("ref"));
                     if (opDocRef.isPresent()) {
                         DocumentReference dr = opDocRef.get();
-                        tasks.add(dr.get());
+                        final String LastMessage = (String) ds.get("LastMessage");
+                        final Date LastMessageDate =
+                                ds.getTimestamp("LastMessageDate").toDate();
+                        tasks.add(dr.get().addOnSuccessListener(
+                                new OnSuccessListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                        ListChatModel listChatModel =
+                                                documentSnapshot.toObject(
+                                                        ListChatModel.class);
+                                        listChatModels.add(listChatModel);
+                                        listChatViewModels.add(
+                                                new ListChatViewModel(listChatModel.getTitle(),
+                                                        LastMessage, listChatModel.getImageChat(),
+                                                        LastMessageDate.toString(),
+                                                        documentSnapshot.getId()));
+                                    }
+                                }));
                     }
                 }
 
-                Tasks.whenAllSuccess(tasks).addOnSuccessListener(
-                        new OnSuccessListener<List<Object>>() {
-                            @Override
-                            public void onSuccess(List<Object> objects) {
-                                for (Object ds :
-                                        objects) {
-                                    ListChatModel listChatModel =
-                                            ((DocumentSnapshot) ds).toObject(ListChatModel.class);
-                                    listChatModels.add(listChatModel);
-                                    listChatViewModels.add(
-                                            new ListChatViewModel(listChatModel.getTitle(),
-                                                    "Test", listChatModel.getImageChat(),
-                                                    "test",
-                                                    ((DocumentSnapshot) ds).getId()));
-                                    listChatAdapter.updateChatListView(listChatViewModels);
-                                }
-                            }
-                        });
+                Tasks.whenAll(tasks).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        listChatAdapter.updateChatListView(listChatViewModels);
+                        tasks.clear();
+                    }
+                });
+//                Tasks.whenAllSuccess(tasks).addOnSuccessListener(
+//                        new OnSuccessListener<List<Object>>() {
+//                            @Override
+//                            public void onSuccess(List<Object> objects) {
+//                                for (Object ds :
+//                                        objects) {
+//                                    ListChatModel listChatModel =
+//                                            ((DocumentSnapshot) ds).toObject(
+//                                                    ListChatModel.class);
+//                                    listChatModels.add(listChatModel);
+//                                    listChatViewModels.add(
+//                                            new ListChatViewModel(listChatModel.getTitle(),
+//                                                    "Test", listChatModel.getImageChat(),
+//                                                    "test",
+//                                                    ((DocumentSnapshot) ds).getId()));
+//                                }
+//                                listChatAdapter.updateChatListView(listChatViewModels);
+//                                tasks.clear();
+//                            }
+//                        });
+            }
+        });
+        toAddChatFragment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addChatFragment = new AddChatFragment();
+                getParentFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
+                        addChatFragment).commit();
             }
         });
         return view;
@@ -194,5 +221,30 @@ public class ListChatFragment extends Fragment {
 
     public void makeToast(String word) {
         Toast.makeText(ctx, word, Toast.LENGTH_LONG).show();
+    }
+
+    public void addNewChat() {
+        ListChatModel listChatModel = new ListChatModel("twojastaraSraDoGara", "", false
+                , false);
+        db.collection("listChat").add(listChatModel).addOnSuccessListener(
+                new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        //TODO
+                        Map<String, Object> refToChat = new HashMap<>();
+                        refToChat.put("LastMessage", "");
+                        refToChat.put("LastMessageDate", Calendar.getInstance().getTime());
+                        refToChat.put("ref", documentReference);
+                        db.collection("user").document(userSharedPref.getId()).collection(
+                                "refToChat").add(refToChat).addOnSuccessListener(
+                                new OnSuccessListener<DocumentReference>() {
+                                    @Override
+                                    public void onSuccess(DocumentReference documentReference) {
+                                        makeToast("New Chat was created");
+                                    }
+                                });
+                    }
+                });
+
     }
 }

@@ -86,9 +86,14 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
     }
 
     public void updateChatListView(List<ListChatViewModel> updated) {
-        listChatViewModels.clear();;
-        listChatViewModels=updated;
-        VIEWS_COUNT = updated.size();
+        listChatViewModels.clear();
+        for (ListChatViewModel l:
+             updated) {
+            listChatViewModels.add(new ListChatViewModel(l.getTitle(),l.getLastMessage(),
+                    l.getImageChatPath(),
+                    l.getLastMessageDate(),l.getIdChat()));
+        }
+        VIEWS_COUNT = listChatViewModels.size();
         notifyDataSetChanged();
     }
 

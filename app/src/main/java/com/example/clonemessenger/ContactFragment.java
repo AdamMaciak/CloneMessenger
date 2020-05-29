@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.EventListener;
@@ -25,12 +27,14 @@ public class ContactFragment extends Fragment {
     FirebaseFirestore db;
     private String userId;
     private FirebaseUser fUser;
+    FloatingActionButton toAddContactFragment;
+    AddContactFragment addContactFragment;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         fUser= FirebaseAuth.getInstance().getCurrentUser();
-        userId=fUser.getUid();
+
         db = FirebaseFirestore.getInstance();
         db.collection("koncepcjaChatu").whereEqualTo("uczestnicy", userId)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -41,6 +45,18 @@ public class ContactFragment extends Fragment {
                     }
                 });
 
-        return inflater.inflate(R.layout.fragment_contact, container, false);
+        View v=inflater.inflate(R.layout.fragment_contact, container, false);
+        toAddContactFragment=v.findViewById(R.id.navigateToAddContactFragment);
+
+        toAddContactFragment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addContactFragment=new AddContactFragment();
+                getParentFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
+                        addContactFragment).commit();
+            }
+        });
+
+        return v;
     }
 }
