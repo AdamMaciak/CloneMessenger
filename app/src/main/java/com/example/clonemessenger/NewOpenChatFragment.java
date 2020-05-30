@@ -317,12 +317,12 @@ public class NewOpenChatFragment extends Fragment {
                             Log.w(TAG, "Listen failed.", e);
                             return;
                         }
-
+                        chat.clear();
                         for (QueryDocumentSnapshot doc : value) {
                             ChatModel city = doc.toObject(ChatModel.class);
                             chat.add(city);
                         }
-                        chat.clear();
+
                         System.out.println("----------------------UWAGA");
                         for (ChatModel ch : chat) {
                             System.out.println(ch.getMessage() + "  " + ch.getSender());
