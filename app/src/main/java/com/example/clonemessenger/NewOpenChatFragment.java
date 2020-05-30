@@ -322,7 +322,7 @@ public class NewOpenChatFragment extends Fragment {
                             ChatModel city = doc.toObject(ChatModel.class);
                             chat.add(city);
                         }
-
+                        chat.clear();
                         System.out.println("----------------------UWAGA");
                         for (ChatModel ch : chat) {
                             System.out.println(ch.getMessage() + "  " + ch.getSender());
