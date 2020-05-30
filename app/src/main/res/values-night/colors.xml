@@ -4,4 +4,5 @@
     <color name="roundedEdge">#353535</color>
     <color name="colorBackground">@android:color/black</color>
     <color name="colorText">#FFFFFF</color>
+    <color name="add_ann_background">#353535</color>
 </resources>

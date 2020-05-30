@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.clonemessenger.Models.UserModel;
 import com.example.clonemessenger.Models.UserModelWithRef;
 import com.example.clonemessenger.Models.UserSharedPref;
@@ -39,7 +40,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ctx = parent.getContext();
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.label_for_contact, parent, false);
+                .inflate(R.layout.listview_layout, parent, false);
         return new ViewHolder(v);
     }
 
@@ -47,6 +48,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         //TODO
         holder.userName.setText(userModelWithRefList.get(position).getUserModel().getName());
+        Glide.with(ctx).load(userModelWithRefList.get(position).getUserModel().getImageCompressPath()).into(holder.imageUser);
         holder.userModelWithRef.setPathToDocument(
                 userModelWithRefList.get(position).getPathToDocument());
         holder.userModelWithRef.setUserModel(userModelWithRefList.get(position).getUserModel());
@@ -65,8 +67,8 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            userName = itemView.findViewById(R.id.placeForUserName);
-            imageUser = itemView.findViewById(R.id.imageUser);
+            userName = itemView.findViewById(R.id.txname);
+            imageUser = itemView.findViewById(R.id.imimage);
             userModelWithRef = new UserModelWithRef();
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

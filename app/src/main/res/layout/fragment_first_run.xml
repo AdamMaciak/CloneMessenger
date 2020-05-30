@@ -2,8 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="20dp"
+    android:background="@drawable/rounded_edge">
 
 
     <TextView
@@ -13,9 +15,9 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="0dp"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="0dp"
         android:gravity="center"
         android:text="@string/welcome"
         android:textSize="24sp" />
@@ -77,23 +79,23 @@
         android:layout_below="@+id/spinner2"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="0dp"
         android:layout_marginTop="40dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="0dp"
         android:gravity="center"
         android:text="@string/loginToUse"
         android:textSize="20sp" />
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="140dp"
+        android:layout_height="65dp"
         android:layout_below="@+id/textView7"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="144dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="140dp" />
+        android:layout_marginStart="110dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="110dp" />
 
     <Button
         android:id="@+id/btnSave"
@@ -102,12 +104,12 @@
         android:layout_below="@+id/sign_in"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="168dp"
+        android:layout_marginStart="140dp"
         android:layout_marginTop="40dp"
-        android:layout_marginEnd="155dp"
+        android:layout_marginEnd="140dp"
+        android:background="@drawable/btn_gradient_upload_image"
         android:text="@string/save"
-        android:visibility="gone"
         android:textColor="#FFFFFF"
-        android:background="@drawable/btn_gradient_upload_image" />
+        android:visibility="gone" />
 
 </RelativeLayout>

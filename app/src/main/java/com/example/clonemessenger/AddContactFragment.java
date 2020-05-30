@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +44,7 @@ import java.util.stream.Collectors;
 public class AddContactFragment extends Fragment {
 
     FirebaseFirestore db;
-    MaterialButton searchButton;
+   // MaterialButton searchButton;
     EditText searchContact;
     RecyclerView recView;
     AddContactAdapter addContactAdapter;
@@ -69,7 +71,7 @@ public class AddContactFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_add_contact, container, false);
-        searchButton = v.findViewById(R.id.searchButton);
+       // searchButton = v.findViewById(R.id.searchButton);
         searchContact = v.findViewById(R.id.nameUser);
         addContactAdapter = new AddContactAdapter();
         LinearLayoutManager linearLayoutManager =
@@ -79,7 +81,67 @@ public class AddContactFragment extends Fragment {
         recView.setHasFixedSize(true);
         recView.setAdapter(addContactAdapter);
 
-        searchButton.setOnClickListener(new View.OnClickListener() {
+        db.collection("user").get()
+                .addOnSuccessListener(
+                        new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                userModels.clear();
+                                List<DocumentSnapshot> documentSnapshots =
+                                        queryDocumentSnapshots
+                                                .getDocuments();
+                                userModelWithRefs =
+                                        new ArrayList<>();
+                                for (DocumentSnapshot ds :
+                                        documentSnapshots) {
+                                    userModelWithRefs.add(new UserModelWithRef(
+                                            ds.getReference().getPath(),
+                                            ds.toObject(UserModel.class)));
+                                }
+                                addContactAdapter.updateRecycleView(
+                                        sortByName(userModelWithRefs,
+                                                searchContact.getText().toString()));
+                            }
+                        });
+
+        searchContact.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                db.collection("user").get()
+                        .addOnSuccessListener(
+                                new OnSuccessListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                        userModels.clear();
+                                        List<DocumentSnapshot> documentSnapshots =
+                                                queryDocumentSnapshots
+                                                        .getDocuments();
+                                        userModelWithRefs =
+                                                new ArrayList<>();
+                                        for (DocumentSnapshot ds :
+                                                documentSnapshots) {
+                                            userModelWithRefs.add(new UserModelWithRef(
+                                                    ds.getReference().getPath(),
+                                                    ds.toObject(UserModel.class)));
+                                        }
+                                        addContactAdapter.updateRecycleView(
+                                                sortByName(userModelWithRefs,
+                                                        searchContact.getText().toString()));
+                                    }
+                                });
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        /*searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 db.collection("user").get()
@@ -105,13 +167,13 @@ public class AddContactFragment extends Fragment {
                                     }
                                 });
             }
-        });
+        });*/
         return v;
     }
 
     private List<UserModelWithRef> sortByName(List<UserModelWithRef> toSort, String name) {
         return toSort.stream()
-                .filter(x -> x.getUserModel().getName().contains(name))
+                .filter(x -> x.getUserModel().getName().toLowerCase().contains(name.toLowerCase()))
                 .collect(Collectors.toList());
     }
 

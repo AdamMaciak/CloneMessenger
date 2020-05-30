@@ -219,7 +219,6 @@ public class FirstRun extends Fragment {
         try {
 
             GoogleSignInAccount acc = completedTask.getResult(ApiException.class);
-            Toast.makeText(getActivity(), "Signed In Successfully", Toast.LENGTH_SHORT).show();
             FirebaseGoogleAuth(acc);
         } catch (ApiException e) {
             Toast.makeText(getActivity(), "Sign In Failed", Toast.LENGTH_SHORT).show();
@@ -237,8 +236,6 @@ public class FirstRun extends Fragment {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                                Toast.makeText(getActivity(), "Successful", Toast.LENGTH_SHORT)
-                                        .show();
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 updateUI(user);
                             } else {
