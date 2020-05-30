@@ -73,7 +73,7 @@ public class AddChatFragment extends Fragment {
                         Map<String, Object> refToChat = new HashMap<>();
                         refToChat.put("LastMessage", "");
                         refToChat.put("LastMessageDate", Calendar.getInstance().getTime());
-                        refToChat.put("ref", documentReference);
+                        refToChat.put("refToChat", documentReference);
                         db.collection("user")
                                 .document(SharedPrefUser.getInstance(ctx).getUser().getId())
                                 .collection(

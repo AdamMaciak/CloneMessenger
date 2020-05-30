@@ -115,7 +115,7 @@ public class ListChatFragment extends Fragment {
                 for (DocumentSnapshot ds :
                         documentSnapshots) {
                     Optional<DocumentReference> opDocRef = Optional.fromNullable(
-                            ds.getDocumentReference("ref"));
+                            ds.getDocumentReference("refToChat"));
                     if (opDocRef.isPresent()) {
                         DocumentReference dr = opDocRef.get();
                         final String LastMessage = (String) ds.get("LastMessage");
