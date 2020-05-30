@@ -21,7 +21,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
+
+import io.opencensus.internal.Utils;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
@@ -54,7 +57,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final ChatAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         final ChatModel chat = mChat.get(position);
         //System.out.println(fUser);
         /*if(!fUser.getUid().equals(chat.getSender())) {
@@ -83,6 +86,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             holder.show_message.setVisibility(View.VISIBLE);
             holder.show_message.setText(chat.getMessage());
         }
+        SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm");
+        holder.time.setText(localDateFormat.format(chat.getTimeSend()));
     }
     @Override
     public long getItemId(int position) {
@@ -100,10 +105,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         public TextView show_message;
         public ImageView profile_image;
         public ImageView show_image;
+        public TextView time;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             show_image = itemView.findViewById(R.id.show_image);
+            time = itemView.findViewById(R.id.time);
             profile_image = itemView.findViewById(R.id.profile_image);
             show_message = itemView.findViewById(R.id.show_message);
 
