@@ -93,6 +93,7 @@ public class AddChatFragment extends Fragment {
                                 db.collection("user")
                                         .document(
                                                 SharedPrefUser.getInstance(ctx).getUser().getId());
+
                         toAdd.put("refToUser", drUser);
                         dr.collection("users").add(toAdd).addOnSuccessListener(
                                 new OnSuccessListener<DocumentReference>() {

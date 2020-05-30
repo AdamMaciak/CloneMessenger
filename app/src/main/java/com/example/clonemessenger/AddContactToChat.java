@@ -29,6 +29,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -184,6 +185,8 @@ public class AddContactToChat extends Fragment implements AddContactToChatAdapte
                 userToAddToChat) {
             Map<String, Object> toAdd = new HashMap<>();
             DocumentReference dr = db.document(user.getPathToDocument());
+            toAdd.put("LastMessage", "");
+            toAdd.put("LastMessageDate", Calendar.getInstance().getTime());
             toAdd.put("refToChat", db.document(refToChatCreated));
             dr.collection("refToChat").add(toAdd).addOnSuccessListener(
                     new OnSuccessListener<DocumentReference>() {
