@@ -58,6 +58,7 @@ public class OpenChatFragment extends Fragment {
 
     ListChatFragment listChatFragment;
     List<ChatModel> chat = new ArrayList<>();
+    List<ChatModel> chat1 = new ArrayList<>();
     RecyclerView recyclerView;
     private ChatAdapter mAdapter;
     private ImageButton btn_sendMessage, btn_getFromGallery, btn_takePhoto;
@@ -70,7 +71,6 @@ public class OpenChatFragment extends Fragment {
     Uri filePath;
     boolean selected_image = false;
     boolean take_photo = false;
-    private Parcelable recyclerViewState;
     LinearLayoutManager linearLayoutManager;
     FirebaseStorage storage;
     private String cameraFilePath = "";
@@ -134,6 +134,7 @@ public class OpenChatFragment extends Fragment {
         recyclerView = root.findViewById(R.id.rvChat);
         recyclerView.setHasFixedSize(true);
 
+
         final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
 //        System.out.println(account.getPhotoUrl());
         linearLayoutManager = new LinearLayoutManager(getContext());
@@ -154,7 +155,6 @@ public class OpenChatFragment extends Fragment {
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
 
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerViewState = recyclerView.getLayoutManager().onSaveInstanceState();
         btn_sendMessage = root.findViewById(R.id.btn_sendMessage);
         btn_getFromGallery = root.findViewById(R.id.btn_getFromGallery);
         btn_takePhoto = root.findViewById(R.id.btn_takePhoto);
@@ -321,22 +321,28 @@ public class OpenChatFragment extends Fragment {
                             Log.w(TAG, "Listen failed.", e);
                             return;
                         }
-
+                        System.out.println("--------------PRZED CLEAR");
+                        chat.clear();
+                        System.out.println("--------------PO CLEAR");
                         for (QueryDocumentSnapshot doc : value) {
                             ChatModel city = doc.toObject(ChatModel.class);
                             chat.add(city);
                         }
 
-                        System.out.println("----------------------UWAGA");
-                        for (ChatModel ch : chat) {
+                        System.out.println("----------------------UWAGA CH1");
+                        chat1=chat;
+                        chat.clear();
+                        for (ChatModel ch : chat1) {
+                            System.out.println(ch.getMessage() + "  " + ch.getSender());
+                        }
+                        System.out.println("----------------------UWAGA CH0");
+                        for (ChatModel ch : chat1) {
                             System.out.println(ch.getMessage() + "  " + ch.getSender());
                         }
                         //System.out.println(account.getPhotoUrl());
 //                        mAdapter = new ChatAdapter(getContext(), chat, account.getPhotoUrl());
-                        mAdapter = new ChatAdapter(getContext(), chat, null);
+                        mAdapter = new ChatAdapter(getContext(), chat1, null);
                         recyclerView.setAdapter(mAdapter);
-                        mAdapter.notifyItemInserted(chat.size() - 1);
-                        linearLayoutManager.scrollToPosition(chat.size() - 1);
                     }
                 });
     }
