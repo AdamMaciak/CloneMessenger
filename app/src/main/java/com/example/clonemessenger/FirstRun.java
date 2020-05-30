@@ -285,10 +285,10 @@ public class FirstRun extends Fragment {
                                         account.getPhotoUrl().toString(), fUser.getUid(), false);
                                 SharedPrefUser.getInstance(getContext()).userLogin(userSharedPref);
                             }
+                            signInButton.setVisibility(View.GONE);
+                            save.setVisibility(View.VISIBLE);
                         }
                     });
-            signInButton.setVisibility(View.GONE);
-            save.setVisibility(View.VISIBLE);
         }
     }
 
