@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.clonemessenger.MainActivity;
-import com.example.clonemessenger.OpenChatFragment;
+import com.example.clonemessenger.NewOpenChatFragment;
 import com.example.clonemessenger.R;
 import com.example.clonemessenger.ViewModels.ListChatViewModel;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -28,12 +28,12 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
     private List<ListChatViewModel> listChatViewModels;
     FirebaseFirestore db;
     private Context ctx;
-    private OpenChatFragment openChatFragment;
+    private NewOpenChatFragment newOpenChatFragment;
 
     public ListChatAdapter() {
         this.listChatViewModels = new ArrayList<>();
         db = FirebaseFirestore.getInstance();
-        openChatFragment = new OpenChatFragment();
+        newOpenChatFragment = new NewOpenChatFragment();
         VIEWS_COUNT = 0;
     }
 
@@ -75,9 +75,9 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    openChatFragment.setListChatViewModel(listChatViewModel);
+                    newOpenChatFragment.setListChatViewModel(listChatViewModel);
                     ((AppCompatActivity) ctx).getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragmentContainer, openChatFragment)
+                            .replace(R.id.fragmentContainer, newOpenChatFragment)
                             .commit();
                     MainActivity.getBottomBar().setVisibility(View.GONE);
                 }

@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -53,8 +52,7 @@ import java.util.List;
 
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
-public class OpenChatFragment extends Fragment {
-
+public class NewOpenChatFragment extends Fragment {
 
     ListChatFragment listChatFragment;
     List<ChatModel> chat = new ArrayList<>();
@@ -73,8 +71,11 @@ public class OpenChatFragment extends Fragment {
     private Parcelable recyclerViewState;
     LinearLayoutManager linearLayoutManager;
     FirebaseStorage storage;
-    private String cameraFilePath = "";
+
     private ListChatViewModel listChatViewModel;
+
+    private String cameraFilePath = "";
+
     public void setListChatViewModel(
             ListChatViewModel listChatViewModel) {
         this.listChatViewModel = new ListChatViewModel();
@@ -177,12 +178,12 @@ public class OpenChatFragment extends Fragment {
                     chat.clear();
                     final Date currentTime = Calendar.getInstance().getTime();
                     if (!message.equals("") && photo == false) {
-                        ChatModel chatModel = new ChatModel(userId, "cjvJnAr9dubyVrGZ7avyfAyaGFy1",
+                        ChatModel chatModel = new ChatModel(userId, "",
                                 message, "", currentTime);
-                        db.collection("messages")
+                        db.collection("listChat")
                                 .document(
-                                        "Bqe17YUMVOc87njQktphxar85R63-cjvJnAr9dubyVrGZ7avyfAyaGFy1")
-                                .collection("ChatModel")
+                                        listChatViewModel.getIdChat())
+                                .collection("messages")
                                 .add(chatModel);
                         et_message.setText("");
                     } else if (!message.equals("") && photo == true) {
@@ -202,13 +203,11 @@ public class OpenChatFragment extends Fragment {
                                 System.out.println(
                                         "------------------------------FILENAME" + filename1);
                                 ChatModel chatModel = new ChatModel(userId,
-                                        "cjvJnAr9dubyVrGZ7avyfAyaGFy1", message, filename1,
+                                        "", message, filename1,
                                         currentTime);
-                                db.collection("messages")
-                                        .document(
-                                                "Bqe17YUMVOc87njQktphxar85R63" +
-                                                        "-cjvJnAr9dubyVrGZ7avyfAyaGFy1")
-                                        .collection("ChatModel")
+                                db.collection("listChat")
+                                        .document(listChatViewModel.getIdChat())
+                                        .collection("messages")
                                         .add(chatModel);
                                 if (!cameraFilePath.equals("")) {
                                     File file = new File(cameraFilePath);
@@ -244,12 +243,11 @@ public class OpenChatFragment extends Fragment {
                                 System.out.println(
                                         "------------------------------FILENAME" + filename1);
                                 ChatModel chatModel = new ChatModel(userId,
-                                        "cjvJnAr9dubyVrGZ7avyfAyaGFy1", "", filename1, currentTime);
-                                db.collection("messages")
+                                        "", "", filename1, currentTime);
+                                db.collection("listChat")
                                         .document(
-                                                "Bqe17YUMVOc87njQktphxar85R63" +
-                                                        "-cjvJnAr9dubyVrGZ7avyfAyaGFy1")
-                                        .collection("ChatModel")
+                                                listChatViewModel.getIdChat())
+                                        .collection("messages")
                                         .add(chatModel);
                                 if (!cameraFilePath.equals("")) {
                                     File file = new File(cameraFilePath);
@@ -307,11 +305,9 @@ public class OpenChatFragment extends Fragment {
     }
 
     private void getDataFromFirestore() {
-
-
-        db.collection("messages")
-                .document("Bqe17YUMVOc87njQktphxar85R63-cjvJnAr9dubyVrGZ7avyfAyaGFy1")
-                .collection("ChatModel")
+        db.collection("listChat")
+                .document(listChatViewModel.getIdChat())
+                .collection("messages")
                 .orderBy("timeSend")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
