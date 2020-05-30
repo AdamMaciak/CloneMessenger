@@ -220,28 +220,4 @@ public class ListChatFragment extends Fragment {
         Toast.makeText(ctx, word, Toast.LENGTH_LONG).show();
     }
 
-    public void addNewChat() {
-        ListChatModel listChatModel = new ListChatModel("twojastaraSraDoGara", "", false
-                , false);
-        db.collection("listChat").add(listChatModel).addOnSuccessListener(
-                new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        //TODO
-                        Map<String, Object> refToChat = new HashMap<>();
-                        refToChat.put("LastMessage", "");
-                        refToChat.put("LastMessageDate", Calendar.getInstance().getTime());
-                        refToChat.put("ref", documentReference);
-                        db.collection("user").document(userSharedPref.getId()).collection(
-                                "refToChat").add(refToChat).addOnSuccessListener(
-                                new OnSuccessListener<DocumentReference>() {
-                                    @Override
-                                    public void onSuccess(DocumentReference documentReference) {
-                                        makeToast("New Chat was created");
-                                    }
-                                });
-                    }
-                });
-
-    }
 }

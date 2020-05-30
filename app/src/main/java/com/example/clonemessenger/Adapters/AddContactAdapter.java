@@ -78,7 +78,7 @@ public class AddContactAdapter extends RecyclerView.Adapter<AddContactAdapter.Vi
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    requestPermission(userModelWithRef.getPathToDocument());
+                    addContact(userModelWithRef.getPathToDocument());
                 }
             });
         }
@@ -116,7 +116,7 @@ public class AddContactAdapter extends RecyclerView.Adapter<AddContactAdapter.Vi
                         });
     }
 
-    private void requestPermission(String reference) {
+    private void addContact(String reference) {
         new AlertDialog.Builder(ctx)
                 .setTitle("Chcesz dodać tego użytkownika?")
                 .setPositiveButton("Tak", new DialogInterface.OnClickListener() {

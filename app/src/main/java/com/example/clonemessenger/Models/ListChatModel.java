@@ -65,4 +65,5 @@ public class ListChatModel {
     public void setDescription(String description) {
         this.description = description;
     }
+
 }

@@ -4,10 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+<!--    TODO-->
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/contentContactLabel"
+        android:background="#fbdb48"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:background="#fbdb48"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_margin="2dp">

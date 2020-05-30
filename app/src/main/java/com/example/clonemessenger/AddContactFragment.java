@@ -82,7 +82,6 @@ public class AddContactFragment extends Fragment {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                makeToast("click button");
                 db.collection("user").get()
                         .addOnSuccessListener(
                                 new OnSuccessListener<QuerySnapshot>() {

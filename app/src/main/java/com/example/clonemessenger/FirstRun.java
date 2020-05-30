@@ -55,49 +55,56 @@ public class FirstRun extends Fragment {
     private int RC_SIGN_IN = 1;
     Spinner spinnerLanguage, spinnerTheme;
     ArrayAdapter arrayLanguage, arrayTheme;
-    List<String> languageList=new ArrayList<>();
-    List<String> themeList=new ArrayList<>();
+    List<String> languageList = new ArrayList<>();
+    List<String> themeList = new ArrayList<>();
     TextView tx1;
     Button save;
     FirebaseFirestore db;
+    UserSharedPref userSharedPref;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        SharedPreferences preferences=getActivity().getSharedPreferences("Settings",MODE_PRIVATE);
-        String language= preferences.getString("Lang","");
-        String color= preferences.getString("ColorInterface","");
-        Locale locale=new Locale(language);
+        SharedPreferences preferences = getActivity().getSharedPreferences("Settings",
+                MODE_PRIVATE);
+        String language = preferences.getString("Lang", "");
+        String color = preferences.getString("ColorInterface", "");
+        Locale locale = new Locale(language);
         Locale.setDefault(locale);
-        Configuration configuration=new Configuration();
-        configuration.locale=locale;
-        getResources().updateConfiguration(configuration,getResources().getDisplayMetrics());
+        Configuration configuration = new Configuration();
+        configuration.locale = locale;
+        getResources().updateConfiguration(configuration, getResources().getDisplayMetrics());
         View view = inflater.inflate(R.layout.fragment_first_run, container, false);
         db = FirebaseFirestore.getInstance();
         signInButton = view.findViewById(R.id.sign_in);
-        save=(Button) view.findViewById(R.id.btnSave);
-        tx1=(TextView) view.findViewById(R.id.textView7);
+        save = (Button) view.findViewById(R.id.btnSave);
+        tx1 = (TextView) view.findViewById(R.id.textView7);
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(
                 getContext().getApplicationContext());
-        if(account!=null){
+        if (account != null) {
             signInButton.setVisibility(View.GONE);
             save.setVisibility(View.VISIBLE);
-            tx1.setText(getResources().getString(R.string.welcome1)+" "+SharedPrefUser.getUserName());
+            tx1.setText(
+                    getResources().getString(R.string.welcome1) + " " + SharedPrefUser.getInstance(
+                            view.getContext()).getUser().getName());
         }
-
 
         mAuth = FirebaseAuth.getInstance();
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences.Editor editor= getContext().getSharedPreferences("Settings", MODE_PRIVATE).edit();
-                editor.putBoolean("firstStart",false);
+                SharedPreferences.Editor editor = getContext().getSharedPreferences("Settings",
+                        MODE_PRIVATE).edit();
+                editor.putBoolean("firstStart", false);
                 editor.apply();
                 MainActivity.bottomBar.setVisibility(View.VISIBLE);
-                ListChatFragment listChatFragment=new ListChatFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
-                        listChatFragment).commit();
+                ListChatFragment listChatFragment = new ListChatFragment();
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer,
+                                listChatFragment)
+                        .commit();
             }
         });
 
@@ -116,24 +123,26 @@ public class FirstRun extends Fragment {
         themeList.add(getResources().getString(R.string.red));
 
 
-        spinnerLanguage=(Spinner) view.findViewById(R.id.spinner);
-        spinnerTheme=(Spinner) view.findViewById(R.id.spinner2);
-        arrayLanguage = new ArrayAdapter(getContext().getApplicationContext(), R.layout.spinner_item, languageList);
+        spinnerLanguage = (Spinner) view.findViewById(R.id.spinner);
+        spinnerTheme = (Spinner) view.findViewById(R.id.spinner2);
+        arrayLanguage = new ArrayAdapter(getContext().getApplicationContext(),
+                R.layout.spinner_item, languageList);
         arrayLanguage.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerLanguage.setAdapter(arrayLanguage);
-        if(language.equals("en")){
+        if (language.equals("en")) {
             spinnerLanguage.setSelection(0);
-        } else if(language.equals("pl")){
+        } else if (language.equals("pl")) {
             spinnerLanguage.setSelection(1);
         }
 
 
-        arrayTheme = new ArrayAdapter(getContext().getApplicationContext(), R.layout.spinner_item, themeList);
+        arrayTheme = new ArrayAdapter(getContext().getApplicationContext(), R.layout.spinner_item,
+                themeList);
         arrayTheme.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerTheme.setAdapter(arrayTheme);
-        if(color.equals("purple")){
+        if (color.equals("purple")) {
             spinnerTheme.setSelection(0);
-        } else if(color.equals("red")){
+        } else if (color.equals("red")) {
             spinnerTheme.setSelection(1);
         }
         final int currentSelectTheme = spinnerTheme.getSelectedItemPosition();
@@ -141,11 +150,12 @@ public class FirstRun extends Fragment {
 
         spinnerLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                if(position==0 && currentSelectLanguage!=position){
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
+                                       int position, long id) {
+                if (position == 0 && currentSelectLanguage != position) {
                     setLocate("en");
                     getActivity().recreate();
-                } else if(position==1 && currentSelectLanguage!=position){
+                } else if (position == 1 && currentSelectLanguage != position) {
                     setLocate("pl");
                     getActivity().recreate();
                 }
@@ -158,14 +168,16 @@ public class FirstRun extends Fragment {
         });
         spinnerTheme.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                SharedPreferences.Editor editor= getContext().getSharedPreferences("Settings", MODE_PRIVATE).edit();
-                if(position==0 && currentSelectTheme!=position){
-                    editor.putString("ColorInterface","purple");
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
+                                       int position, long id) {
+                SharedPreferences.Editor editor = getContext().getSharedPreferences("Settings",
+                        MODE_PRIVATE).edit();
+                if (position == 0 && currentSelectTheme != position) {
+                    editor.putString("ColorInterface", "purple");
                     editor.apply();
                     getActivity().recreate();
-                } else if(position==1 && currentSelectTheme!=position){
-                    editor.putString("ColorInterface","red");
+                } else if (position == 1 && currentSelectTheme != position) {
+                    editor.putString("ColorInterface", "red");
                     editor.apply();
                     getActivity().recreate();
                 }
@@ -176,7 +188,6 @@ public class FirstRun extends Fragment {
 
             }
         });
-
 
 
         signInButton.setOnClickListener(new View.OnClickListener() {
@@ -246,46 +257,61 @@ public class FirstRun extends Fragment {
                 getContext().getApplicationContext());
         if (account != null) {
             db.collection("user")
-                    .document(fUser.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    if (documentSnapshot.exists()) {
-                        UserModel userModel = documentSnapshot.toObject(UserModel.class);
-                        userModel.setOnline(true);
-                        db.collection("user").document(fUser.getUid()).set(userModel);
-                        tx1.setText(getResources().getString(R.string.welcome1) + " " + userModel.getName());
-                        UserSharedPref userSharedPref = new UserSharedPref(userModel.getName(), userModel.getImagePath(), userModel.getImageCompressPath(), fUser.getUid(), userModel.isFullVersion());
-                        SharedPrefUser.getInstance(getContext()).userLogin(userSharedPref);
+                    .document(fUser.getUid())
+                    .get()
+                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            if (documentSnapshot.exists()) {
+                                UserModel userModel = documentSnapshot.toObject(UserModel.class);
+                                userModel.setOnline(true);
+                                db.collection("user").document(fUser.getUid()).set(userModel);
+                                tx1.setText(getResources().getString(
+                                        R.string.welcome1) + " " + userModel.getName());
+                                UserSharedPref userSharedPref = new UserSharedPref(
+                                        userModel.getName(), userModel.getImagePath(),
+                                        userModel.getImageCompressPath(), fUser.getUid(),
+                                        userModel.isFullVersion());
+                                SharedPrefUser.getInstance(getContext()).userLogin(userSharedPref);
 
-                    } else {
-                        UserModel user = new UserModel(account.getDisplayName(), "null", account.getPhotoUrl().toString(), false, true);
-                        db.collection("user").document(fUser.getUid()).set(user);
-                        tx1.setText(getResources().getString(R.string.welcome1) + " " + account.getDisplayName());
-                        UserSharedPref userSharedPref = new UserSharedPref(account.getDisplayName(), "null", account.getPhotoUrl().toString(), fUser.getUid(), false);
-                        SharedPrefUser.getInstance(getContext()).userLogin(userSharedPref);
-                    }
-                }
-            });
+                            } else {
+                                UserModel user = new UserModel(account.getDisplayName(), "null",
+                                        account.getPhotoUrl().toString(), false, true);
+                                db.collection("user").document(fUser.getUid()).set(user);
+                                tx1.setText(getResources().getString(
+                                        R.string.welcome1) + " " + account.getDisplayName());
+                                UserSharedPref userSharedPref = new UserSharedPref(
+                                        account.getDisplayName(), "null",
+                                        account.getPhotoUrl().toString(), fUser.getUid(), false);
+                                SharedPrefUser.getInstance(getContext()).userLogin(userSharedPref);
+                            }
+                        }
+                    });
             signInButton.setVisibility(View.GONE);
             save.setVisibility(View.VISIBLE);
         }
-        }
+    }
+
     private void setLocate(String lang) {
-        Locale locale=new Locale(lang);
+        Locale locale = new Locale(lang);
         Locale.setDefault(locale);
-        Configuration configuration=new Configuration();
-        configuration.locale=locale;
-        getContext().getResources().updateConfiguration(configuration,getContext().getResources().getDisplayMetrics());
-        SharedPreferences.Editor editor= getContext().getSharedPreferences("Settings", MODE_PRIVATE).edit();
-        editor.putString("Lang",lang);
+        Configuration configuration = new Configuration();
+        configuration.locale = locale;
+        getContext().getResources()
+                .updateConfiguration(configuration,
+                        getContext().getResources().getDisplayMetrics());
+        SharedPreferences.Editor editor = getContext().getSharedPreferences("Settings",
+                MODE_PRIVATE).edit();
+        editor.putString("Lang", lang);
         editor.apply();
     }
-    private int getIndex(Spinner spinner, String myString){
+
+    private int getIndex(Spinner spinner, String myString) {
 
         int index = 0;
 
-        for (int i=0;i<spinner.getCount();i++){
-            if (spinner.getItemAtPosition(i).equals(myString)){
+        for (int i = 0; i < spinner.getCount(); i++) {
+            if (spinner.getItemAtPosition(i).equals(myString)) {
                 index = i;
             }
         }

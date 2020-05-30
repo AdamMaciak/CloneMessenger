@@ -3,6 +3,7 @@ package com.example.clonemessenger.Models;
 import android.net.Uri;
 
 import java.util.Date;
+import java.util.Objects;
 
 public class UserModel {
     String name;
@@ -100,4 +101,22 @@ public class UserModel {
         this.imagePath = imagePath;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserModel)) return false;
+        UserModel userModel = (UserModel) o;
+        return isFullVersion() == userModel.isFullVersion() &&
+                isOnline() == userModel.isOnline() &&
+                getName().equals(userModel.getName()) &&
+                getImagePath().equals(userModel.getImagePath()) &&
+                getImageCompressPath().equals(userModel.getImageCompressPath()) &&
+                getLastOnline().equals(userModel.getLastOnline());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getImagePath(), getImageCompressPath(), isFullVersion(),
+                isOnline(), getLastOnline());
+    }
 }
