@@ -27,6 +27,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.clonemessenger.Adapters.ChatAdapter;
 import com.example.clonemessenger.Models.ChatModel;
 import com.example.clonemessenger.ViewModels.ListChatViewModel;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -71,6 +77,7 @@ public class NewOpenChatFragment extends Fragment {
     private Parcelable recyclerViewState;
     LinearLayoutManager linearLayoutManager;
     FirebaseStorage storage;
+    private InterstitialAd mInterstitialAd;
 
     private ListChatViewModel listChatViewModel;
 
@@ -140,6 +147,36 @@ public class NewOpenChatFragment extends Fragment {
         linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setStackFromEnd(true);
         listChatFragment = new ListChatFragment();
+
+        if(!SharedPrefUser.isFullVersion()) {
+            MobileAds.initialize(getContext(), new OnInitializationCompleteListener() {
+                @Override
+                public void onInitializationComplete(InitializationStatus initializationStatus) {
+                }
+            });
+
+            mInterstitialAd = new InterstitialAd(getContext());
+            mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+            mInterstitialAd.loadAd(new AdRequest.Builder().build());
+            mInterstitialAd.setAdListener(new AdListener() {
+                @Override
+                public void onAdLoaded() {
+                    mInterstitialAd.show();
+                }
+
+                @Override
+                public void onAdFailedToLoad(int errorCode) {
+                    Toast.makeText(getContext(),
+                            "onAdFailedToLoad() with error code: " + errorCode,
+                            Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onAdClosed() {
+
+                }
+            });
+        }
 
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override

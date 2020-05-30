@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_margin="2dp"
@@ -18,13 +18,25 @@
             android:id="@+id/imageChat"
             android:layout_width="60dp"
             android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/titleChat"
-            android:layout_width="wrap_content"
+            android:layout_width="261dp"
             android:layout_height="30dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="20dp"
+            android:layout_toEndOf="@+id/imageChat"
             android:fontFamily="@font/roboto_mono_medium"
             android:text="titleChat"
             app:layout_constraintLeft_toRightOf="@id/imageChat"
@@ -34,9 +46,15 @@
             android:id="@+id/lastMessage"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
+            android:layout_below="@+id/titleChat"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="19dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="20dp"
+            android:layout_toEndOf="@+id/imageChat"
             android:fontFamily="@font/roboto_mono_medium"
             android:text="lastMessage"
             app:layout_constraintLeft_toRightOf="@id/imageChat"
             app:layout_constraintTop_toBottomOf="@id/titleChat" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

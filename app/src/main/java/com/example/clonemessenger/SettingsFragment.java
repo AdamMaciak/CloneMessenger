@@ -286,7 +286,7 @@ public class SettingsFragment extends Fragment{
         db.collection("user").document(userSharedPref.getId()).set(user);
 
         SharedPrefUser.getInstance(getContext()).logout();
-        Toast.makeText(getActivity(), "You are Logged Out", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(), "You are Logged Out", Toast.LENGTH_SHORT).show();
         im_log.setImageResource(R.drawable.ic_login);
         tx_log.setText(getResources().getString(R.string.sign_in));
         tx_userName.setVisibility(View.GONE);
@@ -414,7 +414,7 @@ public class SettingsFragment extends Fragment{
         try {
 
             GoogleSignInAccount acc = completedTask.getResult(ApiException.class);
-            Toast.makeText(getActivity(), "Signed In Successfully", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "Signed In Successfully", Toast.LENGTH_SHORT).show();
             FirebaseGoogleAuth(acc);
         } catch (ApiException e) {
             Toast.makeText(getActivity(), "Sign In Failed", Toast.LENGTH_SHORT).show();
@@ -432,8 +432,8 @@ public class SettingsFragment extends Fragment{
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                                Toast.makeText(getActivity(), "Successful", Toast.LENGTH_SHORT)
-                                        .show();
+                                //Toast.makeText(getActivity(), "Successful", Toast.LENGTH_SHORT)
+                                        //.show();
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 updateUI(user);
                             } else {
