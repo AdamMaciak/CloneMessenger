@@ -51,6 +51,7 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
         holder.viewForTitle.setText(listChatViewModels.get(position).getTitle());
         holder.viewForLastMessage.setText(listChatViewModels.get(position).getLastMessage());
         holder.listChatViewModel = listChatViewModels.get(position);
+        //TODO tutaj wstaw ale ten licznik
     }
 
     @Override
@@ -90,7 +91,7 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
                 updated) {
             listChatViewModels.add(new ListChatViewModel(l.getTitle(), l.getLastMessage(),
                     l.getImageChatPath(),
-                    l.getLastMessageDate(), l.getIdChat()));
+                    l.getLastMessageDate(), l.getIdChat(), l.getCountUnreadMessages()));
         }
         VIEWS_COUNT = listChatViewModels.size();
         notifyDataSetChanged();

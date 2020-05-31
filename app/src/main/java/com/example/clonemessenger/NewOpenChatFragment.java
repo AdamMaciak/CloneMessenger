@@ -95,6 +95,7 @@ public class NewOpenChatFragment extends Fragment {
         this.listChatViewModel.setLastMessage(listChatViewModel.getLastMessage());
         this.listChatViewModel.setTitle(listChatViewModel.getTitle());
         this.listChatViewModel.setLastMessageDate(listChatViewModel.getLastMessageDate());
+        this.listChatViewModel.setCountUnreadMessages(listChatViewModel.getCountUnreadMessages());
     }
 
     private File createImageFile() throws IOException {
@@ -193,6 +194,7 @@ public class NewOpenChatFragment extends Fragment {
                 MainActivity.getBottomBar().setVisibility(View.VISIBLE);
             }
         };
+
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
 
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -206,6 +208,8 @@ public class NewOpenChatFragment extends Fragment {
         storage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();
         getDataFromFirestore();
+
+        String test=listChatViewModel.getTitle();
 
         btn_sendMessage.setOnClickListener(new View.OnClickListener() {
             @Override

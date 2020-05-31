@@ -9,6 +9,15 @@ public class ListChatViewModel{
     private String imageChatPath;
     private String lastMessageDate;
     private String idChat;
+    private long countUnreadMessages;
+
+    public long getCountUnreadMessages() {
+        return countUnreadMessages;
+    }
+
+    public void setCountUnreadMessages(long countUnreadMessages) {
+        this.countUnreadMessages = countUnreadMessages;
+    }
 
     public
     ListChatViewModel() {
@@ -21,12 +30,13 @@ public class ListChatViewModel{
     }
 
     public ListChatViewModel(String title, String lastMessage, String imageChatPath,
-                             String lastMessageDate, String idChat) {
+                             String lastMessageDate, String idChat, long countUnreadMessages) {
         this.title = title;
         this.lastMessage = lastMessage;
         this.imageChatPath = imageChatPath;
         this.lastMessageDate = lastMessageDate;
         this.idChat = idChat;
+        this.countUnreadMessages = countUnreadMessages;
     }
 
     public String getTitle() {

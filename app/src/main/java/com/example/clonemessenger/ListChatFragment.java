@@ -36,11 +36,8 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 public class ListChatFragment extends Fragment {
@@ -121,7 +118,7 @@ public class ListChatFragment extends Fragment {
                         final String LastMessage = (String) ds.get("LastMessage");
                         final Date LastMessageDate =
                                 ds.getTimestamp("LastMessageDate").toDate();
-                        final long countUnreadMessages=(long)ds.get("countUnreadMessages");
+                        final long countUnreadMessages = ds.getLong("countUnreadMessages");
                         tasks.add(dr.get().addOnSuccessListener(
                                 new OnSuccessListener<DocumentSnapshot>() {
                                     @Override
@@ -136,7 +133,8 @@ public class ListChatFragment extends Fragment {
                                                             LastMessage,
                                                             listChatModel.getImageChat(),
                                                             LastMessageDate.toString(),
-                                                            documentSnapshot.getId()));
+                                                            documentSnapshot.getId(),
+                                                            countUnreadMessages));
                                         }
                                     }
                                 }));
