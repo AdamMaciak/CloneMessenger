@@ -64,11 +64,11 @@ public class ListChatViewModel {
         this.imageChatPath = imageChatPath;
     }
 
-    public String getLastMessageDate() {
+    public Date getLastMessageDate() {
         return lastMessageDate;
     }
 
-    public void setLastMessageDate(String lastMessageDate) {
+    public void setLastMessageDate(Date lastMessageDate) {
         this.lastMessageDate = lastMessageDate;
     }
 
