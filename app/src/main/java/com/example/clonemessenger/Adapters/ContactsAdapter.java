@@ -60,7 +60,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         } else {
             holder.online.setVisibility(View.GONE);
             SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm");
-            holder.lastOnline.setText(ctx.getResources().getString(R.string.lastOnline)+localDateFormat.format(userModelWithRefList.get(position).getUserModel().getLastOnline()));
+            holder.lastOnline.setText(ctx.getResources().getString(R.string.lastOnline)+" "+localDateFormat.format(userModelWithRefList.get(position).getUserModel().getLastOnline()));
         }
     }
 

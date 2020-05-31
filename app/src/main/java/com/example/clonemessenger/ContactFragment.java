@@ -79,14 +79,14 @@ public class ContactFragment extends Fragment {
         tasks = new ArrayList<>();
         userModelWithRefs = new ArrayList<>();
         db = FirebaseFirestore.getInstance();
-        db.collection("koncepcjaChatu").whereEqualTo("uczestnicy", userId)
+       /* db.collection("koncepcjaChatu").whereEqualTo("uczestnicy", userId)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value,
                                         @Nullable FirebaseFirestoreException e) {
                         System.out.println("---------------------" + value);
                     }
-                });
+                });*/
 
         View v = inflater.inflate(R.layout.fragment_contact, container, false);
         toAddContactFragment = v.findViewById(R.id.navigateToAddContactFragment);
