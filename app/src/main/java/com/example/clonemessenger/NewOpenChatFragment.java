@@ -415,21 +415,26 @@ public class NewOpenChatFragment extends Fragment {
                                         queryDocumentSnapshots.getDocuments();
                                 for (DocumentSnapshot d :
                                         ds) {
-                                    ((DocumentReference) d.get(
-                                            "refToUser")).collection("refToChat")
-                                            .document(listChatViewModel.getIdChat())
-                                            .update("LastMessage", message,
-                                                    "LastMessageDate",
-                                                    currentTime, "countUnreadMessages",
-                                                    FieldValue.increment(1))
-                                            .addOnSuccessListener(
-                                                    new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(
-                                                                Void aVoid) {
+                                    if (((DocumentReference) d.get("refToUser")).getId()
+                                            .equals(SharedPrefUser.getInstance(getContext())
+                                                    .getUser()
+                                                    .getId())) {
+                                        ((DocumentReference) d.get(
+                                                "refToUser")).collection("refToChat")
+                                                .document(listChatViewModel.getIdChat())
+                                                .update("LastMessage", message,
+                                                        "LastMessageDate",
+                                                        currentTime, "countUnreadMessages",
+                                                        FieldValue.increment(1))
+                                                .addOnSuccessListener(
+                                                        new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(
+                                                                    Void aVoid) {
 
-                                                        }
-                                                    });
+                                                            }
+                                                        });
+                                    }
                                 }
                             }
                         });
