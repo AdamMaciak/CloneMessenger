@@ -2,6 +2,7 @@ package com.example.clonemessenger.ViewModels;
 
 import java.util.Date;
 
+//TODO nieużywana może kiedyś
 public class MessageViewModel {
     private String sender;
     private String receiver;

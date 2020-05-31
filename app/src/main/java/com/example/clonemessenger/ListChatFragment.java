@@ -121,6 +121,7 @@ public class ListChatFragment extends Fragment {
                         final String LastMessage = (String) ds.get("LastMessage");
                         final Date LastMessageDate =
                                 ds.getTimestamp("LastMessageDate").toDate();
+                        final long countUnreadMessages=(long)ds.get("countUnreadMessages");
                         tasks.add(dr.get().addOnSuccessListener(
                                 new OnSuccessListener<DocumentSnapshot>() {
                                     @Override
