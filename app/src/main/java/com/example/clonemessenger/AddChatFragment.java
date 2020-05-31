@@ -57,6 +57,7 @@ public class AddChatFragment extends Fragment {
     int GALLERY_REQUEST_CODE = 1;
     String filename;
     FirebaseStorage storage;
+    boolean checked;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,6 +68,7 @@ public class AddChatFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_add_chat, container, false);
+        checked=false;
         SharedPreferences preferences=getActivity().getSharedPreferences("Settings",MODE_PRIVATE);
         String language= preferences.getString("Lang","");
         Locale locale=new Locale(language);
@@ -103,36 +105,48 @@ public class AddChatFragment extends Fragment {
         buttonAddChatFragment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final ProgressDialog progressDialog
-                        = new ProgressDialog(getContext());
-                progressDialog.setMessage(getResources().getString(R.string.uploadPhoto));
-                progressDialog.show();
-                StorageReference riversRef = storage.getReference()
-                        .child("chatPhoto/" + filename);
-                UploadTask uploadTask = riversRef.putBytes(compressedBitmap);
-                uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        StorageReference riversRef2 = storage.getReference();
-                        riversRef2.child("chatPhoto/" + filename)
-                                .getDownloadUrl()
-                                .addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                    @Override
-                                    public void onSuccess(Uri uri) {
-                                        progressDialog.dismiss();
-                                        addNewChat(chatNameEditText.getText().toString(),
-                                                descriptionEditText.getText().toString(),
-                                                uri.toString());
-                                        addChatToUser();
-                                        addContactToChat = new AddContactToChat();
-                                        getParentFragmentManager().beginTransaction()
-                                                .replace(R.id.fragmentContainer,
-                                                        addContactToChat)
-                                                .commit();
-                                    }
-                                });
-                    }
-                });
+                if(checked==true) {
+                    final ProgressDialog progressDialog
+                            = new ProgressDialog(getContext());
+                    progressDialog.setMessage(getResources().getString(R.string.uploadPhoto));
+                    progressDialog.show();
+                    StorageReference riversRef = storage.getReference()
+                            .child("chatPhoto/" + filename);
+                    UploadTask uploadTask = riversRef.putBytes(compressedBitmap);
+                    uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            StorageReference riversRef2 = storage.getReference();
+                            riversRef2.child("chatPhoto/" + filename)
+                                    .getDownloadUrl()
+                                    .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {
+                                            progressDialog.dismiss();
+                                            addNewChat(chatNameEditText.getText().toString(),
+                                                    descriptionEditText.getText().toString(),
+                                                    uri.toString());
+                                            addChatToUser();
+                                            addContactToChat = new AddContactToChat();
+                                            getParentFragmentManager().beginTransaction()
+                                                    .replace(R.id.fragmentContainer,
+                                                            addContactToChat)
+                                                    .commit();
+                                        }
+                                    });
+                        }
+                    });
+                } else {
+                    addNewChat(chatNameEditText.getText().toString(),
+                            descriptionEditText.getText().toString(),
+                            photoUrl);
+                    addChatToUser();
+                    addContactToChat = new AddContactToChat();
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.fragmentContainer,
+                                    addContactToChat)
+                            .commit();
+                }
 
             }
         });
@@ -145,6 +159,7 @@ public class AddChatFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if ((resultCode == Activity.RESULT_OK || requestCode == GALLERY_REQUEST_CODE) && data != null) {
+            checked=true;
             Uri selectedImage = data.getData();
             Uri filePath = Uri.fromFile(new File(getRealPathFromURI(selectedImage)));
             filename = filePath.getLastPathSegment();
@@ -191,7 +206,7 @@ public class AddChatFragment extends Fragment {
                                     @Override
                                     public void onSuccess(Void aVoid) {
                                         setReferenceToChat(dr.getId());
-                                        makeToast("New Chat was created");
+                                        //makeToast("New Chat was created");
                                     }
                                 });
                         Map<String, Object> toAdd = new HashMap<>();
@@ -204,7 +219,7 @@ public class AddChatFragment extends Fragment {
                                 new OnSuccessListener<DocumentReference>() {
                                     @Override
                                     public void onSuccess(DocumentReference documentReference) {
-                                        makeToast("dodano usera do chatu");
+                                        //makeToast("dodano usera do chatu");
                                     }
                                 });
                     }

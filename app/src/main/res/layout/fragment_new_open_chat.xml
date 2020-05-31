@@ -70,7 +70,8 @@
             android:layout_height="45dp"
             android:layout_gravity="right"
             android:layout_marginEnd="4dp"
-            android:src="@drawable/ic_info" />
+            android:src="@drawable/ic_info"
+            android:visibility="gone" />
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.appcompat.widget.Toolbar

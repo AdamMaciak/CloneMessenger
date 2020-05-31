@@ -127,7 +127,6 @@ public class ContactFragment extends Fragment {
                                                         documentSnapshot.getReference()
                                                                 .getPath(),
                                                         documentSnapshot.toObject(UserModel.class)));
-                                                makeToast((String) ds.get("name"));
                                             }
                                         }));
                             }

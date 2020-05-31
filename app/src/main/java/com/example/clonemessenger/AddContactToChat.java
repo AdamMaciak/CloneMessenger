@@ -116,7 +116,7 @@ public class AddContactToChat extends Fragment implements AddContactToChatAdapte
                                                                                 .getPath(),
                                                                         documentSnapshot.toObject(
                                                                                 UserModel.class)));
-                                                        makeToast((String) ds.get("name"));
+                                                        //makeToast((String) ds.get("name"));
                                                     }
                                                 }));
                                     }
@@ -147,11 +147,11 @@ public class AddContactToChat extends Fragment implements AddContactToChatAdapte
         if (userToAddToChat.contains(userModelWithRefList.get(position))) {
             if (userToAddToChat.remove(userModelWithRefList.get(position)))
                 recyclerView.setBackgroundColor(321312);
-            makeToast("juz jest w zbiorze do dodania wiec usune");
+            //makeToast("juz jest w zbiorze do dodania wiec usune");
         } else {
             userToAddToChat.add(userModelWithRefList.get(position));
         }
-        makeToast("dodano to zbioru, position:" + position);
+        //makeToast("dodano to zbioru, position:" + position);
     }
 
     private void showDialogConfirm() {
@@ -190,7 +190,7 @@ public class AddContactToChat extends Fragment implements AddContactToChatAdapte
                             new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
-                                    makeToast("successAddedContactToChat");
+                                    //makeToast("successAddedContactToChat");
                                 }
                             });
         }
@@ -212,7 +212,7 @@ public class AddContactToChat extends Fragment implements AddContactToChatAdapte
                             new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    makeToast("success added contact to Chat");
+                                    //makeToast("success added contact to Chat");
                                 }
                             });
         }
