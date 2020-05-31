@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -87,7 +88,7 @@ public class NewOpenChatFragment extends Fragment {
     private InterstitialAd mInterstitialAd;
     private TextView chatName;
     CircleImageView chatImage;
-
+    private ImageView buttonBack;
     private ListChatViewModel listChatViewModel;
 
     private String cameraFilePath = "";
@@ -149,6 +150,7 @@ public class NewOpenChatFragment extends Fragment {
         // Inflate the layout for this fragment
         chat.clear();
         View root = inflater.inflate(R.layout.fragment_new_open_chat, container, false);
+        buttonBack = root.findViewById(R.id.imageView);
         recyclerView = root.findViewById(R.id.rvChat);
         recyclerView.setHasFixedSize(true);
         final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
@@ -156,6 +158,14 @@ public class NewOpenChatFragment extends Fragment {
         linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setStackFromEnd(true);
         listChatFragment = new ListChatFragment();
+
+        buttonBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getParentFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
+                        new ListChatFragment()).commit();
+            }
+        });
 
         if (!SharedPrefUser.isFullVersion()) {
             MobileAds.initialize(getContext(), new OnInitializationCompleteListener() {
@@ -209,8 +219,8 @@ public class NewOpenChatFragment extends Fragment {
         et_message = root.findViewById(R.id.et_message);
         fUser = FirebaseAuth.getInstance().getCurrentUser();
         userId = fUser.getUid();
-        chatImage=(CircleImageView) root.findViewById(R.id.imageUser);
-        chatName= (TextView) root.findViewById(R.id.txChatName);
+        chatImage = (CircleImageView) root.findViewById(R.id.imageUser);
+        chatName = (TextView) root.findViewById(R.id.txChatName);
         chatName.setText(listChatViewModel.getTitle());
         Glide.with(getContext()).load(listChatViewModel.getImageChatPath()).into(chatImage);
 
@@ -409,7 +419,7 @@ public class NewOpenChatFragment extends Fragment {
                                         queryDocumentSnapshots.getDocuments();
                                 for (DocumentSnapshot d :
                                         ds) {
-                                    if (((DocumentReference) d.get("refToUser")).getId()
+                                    if (!((DocumentReference) d.get("refToUser")).getId()
                                             .equals(SharedPrefUser.getInstance(getContext())
                                                     .getUser()
                                                     .getId())) {
@@ -420,6 +430,21 @@ public class NewOpenChatFragment extends Fragment {
                                                         "LastMessageDate",
                                                         currentTime, "countUnreadMessages",
                                                         FieldValue.increment(1))
+                                                .addOnSuccessListener(
+                                                        new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(
+                                                                    Void aVoid) {
+
+                                                            }
+                                                        });
+                                    } else {
+                                        ((DocumentReference) d.get(
+                                                "refToUser")).collection("refToChat")
+                                                .document(listChatViewModel.getIdChat())
+                                                .update("LastMessage", message,
+                                                        "LastMessageDate",
+                                                        currentTime)
                                                 .addOnSuccessListener(
                                                         new OnSuccessListener<Void>() {
                                                             @Override

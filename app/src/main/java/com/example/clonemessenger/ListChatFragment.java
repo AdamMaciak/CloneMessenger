@@ -105,7 +105,7 @@ public class ListChatFragment extends Fragment {
         listChatViewModels = new ArrayList<>();
 
 
-        //TODO
+        //TODO wywalic orderby
         db.collection("user")
                 .document(userSharedPref.getId())
                 .collection("refToChat")
