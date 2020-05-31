@@ -527,6 +527,7 @@ public class SettingsFragment extends Fragment{
         getContext().getResources().updateConfiguration(configuration,getContext().getResources().getDisplayMetrics());
         SharedPreferences.Editor editor= getContext().getSharedPreferences("Settings", MODE_PRIVATE).edit();
         editor.putString("Lang",lang);
+        editor.putBoolean("lastInSettings",true);
         editor.apply();
     }
 
@@ -540,10 +541,12 @@ public class SettingsFragment extends Fragment{
                 SharedPreferences.Editor editor= getContext().getSharedPreferences("Settings", MODE_PRIVATE).edit();
                 if(i==0){
                     editor.putString("ColorInterface","red");
+                    editor.putBoolean("lastInSettings",true);
                     editor.apply();
                     getActivity().recreate();
                 } else if(i==1){
                     editor.putString("ColorInterface","purple");
+                    editor.putBoolean("lastInSettings",true);
                     editor.apply();
                     getActivity().recreate();
                 }

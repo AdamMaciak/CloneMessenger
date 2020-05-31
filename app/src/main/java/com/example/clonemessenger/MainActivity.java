@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
        firstRun = new FirstRun();
        SharedPreferences preferences=getSharedPreferences("Settings",MODE_PRIVATE);
        boolean fStart=preferences.getBoolean("firstStart",true);
-
+       boolean lastInSettings=preferences.getBoolean("lastInSettings",false);
        getLocale();
        String colour= preferences.getString("ColorInterface","purple");
        switch(colour) {
@@ -90,6 +90,15 @@ public class MainActivity extends AppCompatActivity {
                bottomBar.setVisibility(View.GONE);
                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
                        settingsFragment).commit();
+           } else if(lastInSettings==true){
+               getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
+                       settingsFragment).commit();
+               SharedPreferences.Editor editor= getSharedPreferences("Settings", MODE_PRIVATE).edit();
+               editor.putBoolean("lastInSettings",false);
+               editor.apply();
+           } else {
+               getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
+                       listChatFragment).commit();
            }
        }
         bottomBar.setOnNavigationItemSelectedListener(
