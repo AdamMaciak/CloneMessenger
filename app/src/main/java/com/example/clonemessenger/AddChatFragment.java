@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
-import com.example.clonemessenger.Adapters.AddContactToChatAdapter;
 import com.example.clonemessenger.Models.ListChatModel;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
@@ -77,17 +76,15 @@ public class AddChatFragment extends Fragment {
                         db.collection("user")
                                 .document(SharedPrefUser.getInstance(ctx).getUser().getId())
                                 .collection(
-                                        "refToChat")
-                                .add(refToChat)
-                                .addOnSuccessListener(
-                                        new OnSuccessListener<DocumentReference>() {
-                                            @Override
-                                            public void onSuccess(
-                                                    DocumentReference documentReference) {
-                                                setReferenceToChat(dr.getPath());
-                                                makeToast("New Chat was created");
-                                            }
-                                        });
+                                        "refToChat").document(dr.getId())
+                                .set(refToChat)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        setReferenceToChat(dr.getId());
+                                        makeToast("New Chat was created");
+                                    }
+                                });
                         Map<String, Object> toAdd = new HashMap<>();
                         DocumentReference drUser =
                                 db.collection("user")

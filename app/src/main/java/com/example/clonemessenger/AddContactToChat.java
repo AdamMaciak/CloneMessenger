@@ -48,7 +48,7 @@ public class AddContactToChat extends Fragment implements AddContactToChatAdapte
     List<UserModelWithRef> userModelWithRefList;
     Set<UserModelWithRef> userToAddToChat;
     FloatingActionButton confirmButton;
-    String refToChatCreated;
+    String idChatCreated;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -169,13 +169,17 @@ public class AddContactToChat extends Fragment implements AddContactToChatAdapte
             Map<String, Object> toAdd = new HashMap<>();
             DocumentReference dr = db.document(user.getPathToDocument());
             toAdd.put("refToUser", dr);
-            db.document(refToChatCreated).collection("users").add(toAdd).addOnSuccessListener(
-                    new OnSuccessListener<DocumentReference>() {
-                        @Override
-                        public void onSuccess(DocumentReference documentReference) {
-                            makeToast("successAddedContactToChat");
-                        }
-                    });
+            db.collection("listChat")
+                    .document(idChatCreated)
+                    .collection("users")
+                    .add(toAdd)
+                    .addOnSuccessListener(
+                            new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    makeToast("successAddedContactToChat");
+                                }
+                            });
         }
         // db.document(refToChatCreated)
     }
@@ -187,19 +191,22 @@ public class AddContactToChat extends Fragment implements AddContactToChatAdapte
             DocumentReference dr = db.document(user.getPathToDocument());
             toAdd.put("LastMessage", "");
             toAdd.put("LastMessageDate", Calendar.getInstance().getTime());
-            toAdd.put("refToChat", db.document(refToChatCreated));
-            dr.collection("refToChat").add(toAdd).addOnSuccessListener(
-                    new OnSuccessListener<DocumentReference>() {
-                        @Override
-                        public void onSuccess(DocumentReference documentReference) {
-                            makeToast("successAddedChatToContact");
-                        }
-                    });
+            toAdd.put("refToChat", db.document("listChat/" + idChatCreated));
+            dr.collection("refToChat")
+                    .document(idChatCreated.trim())
+                    .set(toAdd)
+                    .addOnSuccessListener(
+                            new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    makeToast("success added contact to Chat");
+                                }
+                            });
         }
     }
 
     public void setReference(String refToChat) {
-        refToChatCreated = refToChat;
+        idChatCreated = refToChat;
     }
 
     private void makeToast(String word) {

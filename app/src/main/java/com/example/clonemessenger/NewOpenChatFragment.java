@@ -39,6 +39,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -148,7 +150,7 @@ public class NewOpenChatFragment extends Fragment {
         linearLayoutManager.setStackFromEnd(true);
         listChatFragment = new ListChatFragment();
 
-        if(!SharedPrefUser.isFullVersion()) {
+        if (!SharedPrefUser.isFullVersion()) {
             MobileAds.initialize(getContext(), new OnInitializationCompleteListener() {
                 @Override
                 public void onInitializationComplete(InitializationStatus initializationStatus) {
@@ -222,6 +224,37 @@ public class NewOpenChatFragment extends Fragment {
                                         listChatViewModel.getIdChat())
                                 .collection("messages")
                                 .add(chatModel);
+
+                        db.collection("listChat")
+                                .document(listChatViewModel.getIdChat())
+                                .collection("users")
+                                .get()
+                                .addOnSuccessListener(
+                                        new OnSuccessListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onSuccess(
+                                                    QuerySnapshot queryDocumentSnapshots) {
+                                                List<DocumentSnapshot> ds =
+                                                        queryDocumentSnapshots.getDocuments();
+                                                for (DocumentSnapshot d :
+                                                        ds) {
+                                                    ((DocumentReference) d.get(
+                                                            "refToUser")).collection("refToChat")
+                                                            .document(listChatViewModel.getIdChat())
+                                                            .update("LastMessage", message,
+                                                                    "LastMessageDate",
+                                                                    currentTime)
+                                                            .addOnSuccessListener(
+                                                                    new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(
+                                                                                Void aVoid) {
+
+                                                                        }
+                                                                    });
+                                                }
+                                            }
+                                        });
                         et_message.setText("");
                     } else if (!message.equals("") && photo == true) {
                         StorageReference riversRef = storage.getReference()
