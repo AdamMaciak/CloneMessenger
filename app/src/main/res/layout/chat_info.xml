@@ -14,16 +14,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="17dp"
-            android:layout_toEndOf="@+id/titleChat" />
-
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imageChat"
             android:layout_width="60dp"
@@ -76,5 +66,24 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="66dp"
             android:layout_toEndOf="@+id/lastMessage" />
+
+        <TextView
+            android:id="@+id/counter"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="center"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="9dp"
+            android:layout_marginEnd="9dp"
+            android:layout_toEndOf="@+id/titleChat"
+            android:background="@drawable/circle"
+            android:gravity="center"
+            android:shadowColor="@android:color/white"
+            android:shadowRadius="10.0"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:visibility="gone" />
     </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

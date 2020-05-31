@@ -1,6 +1,7 @@
 package com.example.clonemessenger.Adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,7 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
     FirebaseFirestore db;
     private Context ctx;
     private NewOpenChatFragment newOpenChatFragment;
+    private List<String> photoUrl=new ArrayList<>();
 
     public ListChatAdapter() {
         this.listChatViewModels = new ArrayList<>();
@@ -51,13 +53,21 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        holder.circleImageView.setTag(position);
         holder.viewForTitle.setText(listChatViewModels.get(position).getTitle());
         holder.viewForLastMessage.setText(listChatViewModels.get(position).getLastMessage());
         SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm");
+        photoUrl.add(listChatViewModels.get(position).getImageChatPath());
         holder.time.setText(localDateFormat.format(listChatViewModels.get(position).getLastMessageDate()));
         Glide.with(ctx).load(listChatViewModels.get(position).getImageChatPath()).into(holder.circleImageView);
         holder.listChatViewModel = listChatViewModels.get(position);
-        //TODO tutaj wstaw ale ten licznik
+
+        if(listChatViewModels.get(position).getCountUnreadMessages()>0){
+            holder.counter.setVisibility(View.VISIBLE);
+            holder.counter.setText(String.valueOf(listChatViewModels.get(position).getCountUnreadMessages()));
+            holder.viewForTitle.setTypeface(holder.viewForTitle.getTypeface(), Typeface.BOLD_ITALIC);
+            holder.viewForLastMessage.setTypeface(holder.viewForLastMessage.getTypeface(), Typeface.BOLD_ITALIC);
+        }
     }
 
     @Override
@@ -69,6 +79,7 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
 
         TextView viewForTitle;
         TextView time;
+        TextView counter;
         CircleImageView circleImageView;
         TextView viewForLastMessage;
         ListChatViewModel listChatViewModel;
@@ -77,6 +88,7 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
             super(itemView);
             circleImageView = itemView.findViewById(R.id.imageChat);
             viewForLastMessage = itemView.findViewById(R.id.lastMessage);
+            counter= itemView.findViewById(R.id.counter);
             viewForTitle = itemView.findViewById(R.id.titleChat);
             time= itemView.findViewById(R.id.txTime);
             listChatViewModel = new ListChatViewModel();
@@ -86,6 +98,8 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
                     newOpenChatFragment.setListChatViewModel(listChatViewModel);
                     Bundle bundle = new Bundle();
                     bundle.putString("title",viewForTitle.getText().toString());
+                    System.out.println("-----------------------"+photoUrl.get((int)circleImageView.getTag()));
+                    bundle.putString("photo",photoUrl.get((int)circleImageView.getTag()));
                     newOpenChatFragment.setArguments(bundle);
                     ((AppCompatActivity) ctx).getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragmentContainer, newOpenChatFragment)
