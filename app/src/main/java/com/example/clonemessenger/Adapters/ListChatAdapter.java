@@ -1,6 +1,7 @@
 package com.example.clonemessenger.Adapters;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.clonemessenger.MainActivity;
 import com.example.clonemessenger.NewOpenChatFragment;
 import com.example.clonemessenger.R;
@@ -53,6 +55,7 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
         holder.viewForLastMessage.setText(listChatViewModels.get(position).getLastMessage());
         SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm");
         holder.time.setText(localDateFormat.format(listChatViewModels.get(position).getLastMessageDate()));
+        Glide.with(ctx).load(listChatViewModels.get(position).getImageChatPath()).into(holder.circleImageView);
         holder.listChatViewModel = listChatViewModels.get(position);
     }
 
@@ -80,6 +83,9 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
                 @Override
                 public void onClick(View v) {
                     newOpenChatFragment.setListChatViewModel(listChatViewModel);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("title",viewForTitle.getText().toString());
+                    newOpenChatFragment.setArguments(bundle);
                     ((AppCompatActivity) ctx).getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragmentContainer, newOpenChatFragment)
                             .commit();

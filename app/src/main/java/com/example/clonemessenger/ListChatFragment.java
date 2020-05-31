@@ -33,6 +33,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -99,7 +100,7 @@ public class ListChatFragment extends Fragment {
         db.collection("user")
                 .document(userSharedPref.getId())
                 .collection("refToChat")
-                .orderBy("LastMessageDate").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                .orderBy("LastMessageDate", Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots,
                                 @Nullable FirebaseFirestoreException e) {
@@ -121,7 +122,7 @@ public class ListChatFragment extends Fragment {
                         final String LastMessage = (String) ds.get("LastMessage");
                         final Date LastMessageDate =
                                 ds.getTimestamp("LastMessageDate").toDate();
-                        final long countUnreadMessages=(long)ds.get("countUnreadMessages");
+                        //final long countUnreadMessages=(long)ds.get("countUnreadMessages");
                         tasks.add(dr.get().addOnSuccessListener(
                                 new OnSuccessListener<DocumentSnapshot>() {
                                     @Override

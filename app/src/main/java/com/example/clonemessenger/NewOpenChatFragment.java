@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -60,6 +61,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class NewOpenChatFragment extends Fragment {
@@ -82,6 +85,8 @@ public class NewOpenChatFragment extends Fragment {
     LinearLayoutManager linearLayoutManager;
     FirebaseStorage storage;
     private InterstitialAd mInterstitialAd;
+    private TextView chatName;
+    CircleImageView chatImage;
 
     private ListChatViewModel listChatViewModel;
 
@@ -142,10 +147,10 @@ public class NewOpenChatFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         chat.clear();
-        View root = inflater.inflate(R.layout.fragment_open_chat, container, false);
+        View root = inflater.inflate(R.layout.fragment_new_open_chat, container, false);
         recyclerView = root.findViewById(R.id.rvChat);
         recyclerView.setHasFixedSize(true);
-
+        chatImage=(CircleImageView) root.findViewById(R.id.chatPhoto);
         final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
 //        System.out.println(account.getPhotoUrl());
         linearLayoutManager = new LinearLayoutManager(getContext());
@@ -203,10 +208,20 @@ public class NewOpenChatFragment extends Fragment {
         et_message = root.findViewById(R.id.et_message);
         fUser = FirebaseAuth.getInstance().getCurrentUser();
         userId = fUser.getUid();
+        chatName= (TextView) root.findViewById(R.id.txChatName);
+        Bundle bundle = this.getArguments();
+        if(bundle != null){
+            String title=bundle.getString("title");
+            chatName.setText(title);
+            //Glide.with(getContext()).load(bundle.getString("photo")).into(chatImage);
+
+        }
+
         storage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();
         getDataFromFirestore();
 
+        //
         btn_sendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

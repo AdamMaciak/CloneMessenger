@@ -26,4 +26,8 @@
     <string name="loginToUse">Zaloguj się aby móc korzystać z aplikacji</string>
     <string name="welcome">Witamy w aplikacji Clone Messanger</string>
     <string name="welcome1">Witaj</string>
+    <string name="chatName">Nazwa czatu</string>
+    <string name="description">Opis</string>
+    <string name="chatPhoto">Zdjęcie (kliknij by zmienić)</string>
+    <string name="uploadPhoto">Trwa ustawianie zdjęcia</string>
 </resources>

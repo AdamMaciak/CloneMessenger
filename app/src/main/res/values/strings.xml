@@ -25,4 +25,8 @@
     <string name="loginToUse">Log in to be able to use the application</string>
     <string name="welcome">Welcome in CloneMessanger App</string>
     <string name="welcome1">Welcome</string>
+    <string name="chatName">Chat name</string>
+    <string name="description">Description</string>
+    <string name="chatPhoto">Photo (click to change)</string>
+    <string name="uploadPhoto">Set photo in progress</string>
 </resources>

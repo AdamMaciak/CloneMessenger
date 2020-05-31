@@ -19,9 +19,9 @@
             android:layout_height="30dp"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="6dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="17dp"
             android:layout_toEndOf="@+id/titleChat" />
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -54,26 +54,27 @@
 
         <TextView
             android:id="@+id/lastMessage"
-            android:layout_width="219dp"
+            android:layout_width="189dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/titleChat"
             android:layout_marginStart="20dp"
             android:layout_marginTop="9dp"
             android:layout_toEndOf="@+id/imageChat"
             android:fontFamily="@font/roboto_mono_medium"
+            android:maxLines="1"
             android:text="lastMessage"
             app:layout_constraintLeft_toRightOf="@id/imageChat"
             app:layout_constraintTop_toBottomOf="@id/titleChat" />
 
         <TextView
             android:id="@+id/txTime"
-            android:layout_width="wrap_content"
+            android:layout_width="47dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/titleChat"
             android:layout_alignParentEnd="true"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="66dp"
             android:layout_toEndOf="@+id/lastMessage" />
     </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
