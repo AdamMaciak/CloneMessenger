@@ -151,7 +151,6 @@ public class NewOpenChatFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_new_open_chat, container, false);
         recyclerView = root.findViewById(R.id.rvChat);
         recyclerView.setHasFixedSize(true);
-        chatImage=(CircleImageView) root.findViewById(R.id.chatPhoto);
         final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
 //        System.out.println(account.getPhotoUrl());
         linearLayoutManager = new LinearLayoutManager(getContext());
@@ -210,12 +209,15 @@ public class NewOpenChatFragment extends Fragment {
         et_message = root.findViewById(R.id.et_message);
         fUser = FirebaseAuth.getInstance().getCurrentUser();
         userId = fUser.getUid();
+        chatImage=(CircleImageView) root.findViewById(R.id.imageUser);
         chatName= (TextView) root.findViewById(R.id.txChatName);
         Bundle bundle = this.getArguments();
         if(bundle != null){
             String title=bundle.getString("title");
+            String photo=bundle.getString("photo");
+            System.out.println("-----------------"+photo);
             chatName.setText(title);
-            //Glide.with(getContext()).load(bundle.getString("photo")).into(chatImage);
+            Glide.with(getContext()).load(photo).into(chatImage);
 
         }
 

@@ -43,6 +43,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.firebase.firestore.Query.Direction.DESCENDING;
+
 
 public class ListChatFragment extends Fragment {
 
