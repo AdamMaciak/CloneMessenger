@@ -211,15 +211,9 @@ public class NewOpenChatFragment extends Fragment {
         userId = fUser.getUid();
         chatImage=(CircleImageView) root.findViewById(R.id.imageUser);
         chatName= (TextView) root.findViewById(R.id.txChatName);
-        Bundle bundle = this.getArguments();
-        if(bundle != null){
-            String title=bundle.getString("title");
-            String photo=bundle.getString("photo");
-            System.out.println("-----------------"+photo);
-            chatName.setText(title);
-            Glide.with(getContext()).load(photo).into(chatImage);
+        chatName.setText(listChatViewModel.getTitle());
+        Glide.with(getContext()).load(listChatViewModel.getImageChatPath()).into(chatImage);
 
-        }
 
         storage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();

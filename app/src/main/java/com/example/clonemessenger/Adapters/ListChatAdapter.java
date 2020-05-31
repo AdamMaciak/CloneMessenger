@@ -33,7 +33,6 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
     FirebaseFirestore db;
     private Context ctx;
     private NewOpenChatFragment newOpenChatFragment;
-    private List<String> photoUrl=new ArrayList<>();
 
     public ListChatAdapter() {
         this.listChatViewModels = new ArrayList<>();
@@ -57,7 +56,6 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
         holder.viewForTitle.setText(listChatViewModels.get(position).getTitle());
         holder.viewForLastMessage.setText(listChatViewModels.get(position).getLastMessage());
         SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm");
-        photoUrl.add(listChatViewModels.get(position).getImageChatPath());
         holder.time.setText(localDateFormat.format(listChatViewModels.get(position).getLastMessageDate()));
         Glide.with(ctx).load(listChatViewModels.get(position).getImageChatPath()).into(holder.circleImageView);
         holder.listChatViewModel = listChatViewModels.get(position);
@@ -96,11 +94,6 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
                 @Override
                 public void onClick(View v) {
                     newOpenChatFragment.setListChatViewModel(listChatViewModel);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("title",viewForTitle.getText().toString());
-                    System.out.println("-----------------------"+photoUrl.get((int)circleImageView.getTag()));
-                    bundle.putString("photo",photoUrl.get((int)circleImageView.getTag()));
-                    newOpenChatFragment.setArguments(bundle);
                     ((AppCompatActivity) ctx).getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragmentContainer, newOpenChatFragment)
                             .commit();
