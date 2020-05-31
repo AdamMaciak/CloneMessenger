@@ -21,6 +21,7 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -147,8 +148,10 @@ public class NewOpenChatFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         // Inflate the layout for this fragment
         chat.clear();
+
         View root = inflater.inflate(R.layout.fragment_new_open_chat, container, false);
         buttonBack = root.findViewById(R.id.imageView);
         recyclerView = root.findViewById(R.id.rvChat);
@@ -164,6 +167,7 @@ public class NewOpenChatFragment extends Fragment {
             public void onClick(View v) {
                 getParentFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
                         new ListChatFragment()).commit();
+                ((AppCompatActivity) getActivity()).getSupportActionBar().show();
             }
         });
 
@@ -205,6 +209,7 @@ public class NewOpenChatFragment extends Fragment {
                         .replace(R.id.fragmentContainer, listChatFragment)
                         .commit();
                 //TODO temporary solution
+                ((AppCompatActivity) getActivity()).getSupportActionBar().show();
                 MainActivity.getBottomBar().setVisibility(View.VISIBLE);
             }
         };

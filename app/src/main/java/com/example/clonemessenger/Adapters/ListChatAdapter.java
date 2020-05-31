@@ -63,8 +63,8 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
         if(listChatViewModels.get(position).getCountUnreadMessages()>0){
             holder.counter.setVisibility(View.VISIBLE);
             holder.counter.setText(String.valueOf(listChatViewModels.get(position).getCountUnreadMessages()));
-            holder.viewForTitle.setTypeface(holder.viewForTitle.getTypeface(), Typeface.BOLD_ITALIC);
-            holder.viewForLastMessage.setTypeface(holder.viewForLastMessage.getTypeface(), Typeface.BOLD_ITALIC);
+            holder.viewForTitle.setTypeface(holder.viewForTitle.getTypeface(), Typeface.BOLD);
+            holder.viewForLastMessage.setTypeface(holder.viewForLastMessage.getTypeface(), Typeface.BOLD);
         }
     }
 

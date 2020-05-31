@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -65,6 +66,7 @@ public class FirstRun extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         SharedPreferences preferences = getActivity().getSharedPreferences("Settings",
                 MODE_PRIVATE);
         String language = preferences.getString("Lang", "");
@@ -105,6 +107,7 @@ public class FirstRun extends Fragment {
                         .replace(R.id.fragmentContainer,
                                 listChatFragment)
                         .commit();
+                ((AppCompatActivity) getActivity()).getSupportActionBar().show();
             }
         });
 

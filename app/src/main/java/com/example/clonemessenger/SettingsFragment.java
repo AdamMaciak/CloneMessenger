@@ -135,6 +135,7 @@ public class SettingsFragment extends Fragment{
         Configuration configuration=new Configuration();
         configuration.locale=locale;
         getResources().updateConfiguration(configuration,getResources().getDisplayMetrics());
+        getActivity().setTitle(getResources().getString(R.string.Settings));
         view = inflater.inflate(R.layout.fragment_settings, container, false);
 
         Intent intent= new Intent(getContext(),PayPalService.class);

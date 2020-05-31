@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -36,7 +38,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+
+import static android.content.Context.MODE_PRIVATE;
 
 
 public class AddChatFragment extends Fragment {
@@ -62,6 +67,14 @@ public class AddChatFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_add_chat, container, false);
+        SharedPreferences preferences=getActivity().getSharedPreferences("Settings",MODE_PRIVATE);
+        String language= preferences.getString("Lang","");
+        Locale locale=new Locale(language);
+        Locale.setDefault(locale);
+        Configuration configuration=new Configuration();
+        configuration.locale=locale;
+        getResources().updateConfiguration(configuration,getResources().getDisplayMetrics());
+        getActivity().setTitle(getResources().getString(R.string.createChat));
         storage = FirebaseStorage.getInstance();
         chatNameEditText = v.findViewById(R.id.chatName);
         descriptionEditText = v.findViewById(R.id.descriptionChat);

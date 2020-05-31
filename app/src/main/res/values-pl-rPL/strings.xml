@@ -30,4 +30,7 @@
     <string name="description">Opis</string>
     <string name="chatPhoto">Zdjęcie (kliknij by zmienić)</string>
     <string name="uploadPhoto">Trwa ustawianie zdjęcia</string>
+    <string name="createChat">Stwórz nowy czat</string>
+    <string name="addUserToChat">Dodaj użytkowników do czatu</string>
+    <string name="addPerson">Dodaj osobe</string>
 </resources>

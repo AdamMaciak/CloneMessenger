@@ -3,6 +3,8 @@ package com.example.clonemessenger;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,9 +35,12 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class AddContactToChat extends Fragment implements AddContactToChatAdapter.OnContactListener {
 
@@ -60,6 +65,14 @@ public class AddContactToChat extends Fragment implements AddContactToChatAdapte
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_add_contact_to_chat, container, false);
+        SharedPreferences preferences=getActivity().getSharedPreferences("Settings",MODE_PRIVATE);
+        String language= preferences.getString("Lang","");
+        Locale locale=new Locale(language);
+        Locale.setDefault(locale);
+        Configuration configuration=new Configuration();
+        configuration.locale=locale;
+        getResources().updateConfiguration(configuration,getResources().getDisplayMetrics());
+        getActivity().setTitle(getResources().getString(R.string.addUserToChat));
         confirmButton = v.findViewById(R.id.confirmButton);
         db = FirebaseFirestore.getInstance();
         userSharedPref = SharedPrefUser.getInstance(v.getContext()).getUser();

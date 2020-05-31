@@ -1,6 +1,8 @@
 package com.example.clonemessenger;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -37,8 +39,10 @@ import com.google.firebase.firestore.auth.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
+import static android.content.Context.MODE_PRIVATE;
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class ContactFragment extends Fragment {
@@ -63,6 +67,14 @@ public class ContactFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ctx = getActivity();
+        SharedPreferences preferences=getActivity().getSharedPreferences("Settings",MODE_PRIVATE);
+        String language= preferences.getString("Lang","");
+        Locale locale=new Locale(language);
+        Locale.setDefault(locale);
+        Configuration configuration=new Configuration();
+        configuration.locale=locale;
+        getResources().updateConfiguration(configuration,getResources().getDisplayMetrics());
+        getActivity().setTitle(getResources().getString(R.string.contacts));
         userSharedPref = SharedPrefUser.getInstance(getContext()).getUser();
         tasks = new ArrayList<>();
         userModelWithRefs = new ArrayList<>();
