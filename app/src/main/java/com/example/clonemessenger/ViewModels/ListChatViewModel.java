@@ -2,12 +2,14 @@ package com.example.clonemessenger.ViewModels;
 
 import androidx.annotation.NonNull;
 
-public class ListChatViewModel{
+import java.util.Date;
+
+public class ListChatViewModel {
 
     private String title;
     private String lastMessage;
     private String imageChatPath;
-    private String lastMessageDate;
+    private Date lastMessageDate;
     private String idChat;
     private long countUnreadMessages;
 
@@ -19,8 +21,7 @@ public class ListChatViewModel{
         this.countUnreadMessages = countUnreadMessages;
     }
 
-    public
-    ListChatViewModel() {
+    public ListChatViewModel() {
     }
 
     @NonNull
@@ -30,7 +31,7 @@ public class ListChatViewModel{
     }
 
     public ListChatViewModel(String title, String lastMessage, String imageChatPath,
-                             String lastMessageDate, String idChat, long countUnreadMessages) {
+                             Date lastMessageDate, String idChat, long countUnreadMessages) {
         this.title = title;
         this.lastMessage = lastMessage;
         this.imageChatPath = imageChatPath;

@@ -17,6 +17,7 @@ import com.example.clonemessenger.R;
 import com.example.clonemessenger.ViewModels.ListChatViewModel;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +51,8 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.viewForTitle.setText(listChatViewModels.get(position).getTitle());
         holder.viewForLastMessage.setText(listChatViewModels.get(position).getLastMessage());
+        SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm");
+        holder.time.setText(localDateFormat.format(listChatViewModels.get(position).getLastMessageDate()));
         holder.listChatViewModel = listChatViewModels.get(position);
         //TODO tutaj wstaw ale ten licznik
     }
@@ -62,6 +65,7 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
     class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView viewForTitle;
+        TextView time;
         CircleImageView circleImageView;
         TextView viewForLastMessage;
         ListChatViewModel listChatViewModel;
@@ -71,6 +75,7 @@ public class ListChatAdapter extends RecyclerView.Adapter<ListChatAdapter.ViewHo
             circleImageView = itemView.findViewById(R.id.imageChat);
             viewForLastMessage = itemView.findViewById(R.id.lastMessage);
             viewForTitle = itemView.findViewById(R.id.titleChat);
+            time= itemView.findViewById(R.id.txTime);
             listChatViewModel = new ListChatViewModel();
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

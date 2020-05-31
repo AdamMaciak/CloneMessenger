@@ -36,29 +36,30 @@
             android:layout_height="45dp"
             android:src="@drawable/ic_arrow_back" />
 
-        <com.google.android.material.card.MaterialCardView
+        <!--<com.google.android.material.card.MaterialCardView
             android:id="@+id/cardImage"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginStart="8dp"
             app:cardCornerRadius="25dp"
             app:strokeColor="#000000"
-            app:strokeWidth="1dp">
+            app:strokeWidth="1dp">-->
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/imageUser"
+                android:layout_marginLeft="5dp"
                 android:layout_width="50dp"
                 android:layout_height="50dp" />
             <!--android:contentDescription="@string/nav_header_desc"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         app:srcCompat="@mipmap/ic_launcher_round"-->
-        </com.google.android.material.card.MaterialCardView>
+<!--        </com.google.android.material.card.MaterialCardView>-->
 
         <TextView
-            android:id="@+id/textView4"
+            android:id="@+id/txChatName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="10dp"
             android:text="Nazwa użytkownika"
             android:textColor="#FFFFFF"
             android:textSize="20sp" />
