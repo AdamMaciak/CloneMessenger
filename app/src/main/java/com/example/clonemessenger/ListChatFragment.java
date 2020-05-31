@@ -6,10 +6,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.clonemessenger.Adapters.ListChatAdapter;
 import com.example.clonemessenger.Models.ListChatModel;
+import com.example.clonemessenger.Models.UserModelWithRef;
 import com.example.clonemessenger.Models.UserSharedPref;
 import com.example.clonemessenger.ViewModels.ListChatViewModel;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -42,6 +46,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.google.firebase.firestore.Query.Direction.DESCENDING;
 
@@ -59,7 +64,7 @@ public class ListChatFragment extends Fragment {
     List<ListChatModel> listChatModels;
     List<ListChatViewModel> listChatViewModels;
     List<Task<DocumentSnapshot>> tasks;
-
+    EditText searchByName;
     UserSharedPref userSharedPref;
 
     FloatingActionButton toAddChatFragment;
@@ -84,7 +89,7 @@ public class ListChatFragment extends Fragment {
         ctx = getContext();
         tasks = new ArrayList<>();
         userSharedPref = SharedPrefUser.getInstance(getContext()).getUser();
-
+        searchByName=(EditText) view.findViewById(R.id.searchByName);
         toAddChatFragment = view.findViewById(R.id.navigateToAddChatFragment);
 
         if (ContextCompat.checkSelfPermission(getContext(),
@@ -97,6 +102,7 @@ public class ListChatFragment extends Fragment {
         }
 
         listChatViewModels = new ArrayList<>();
+
 
         //TODO
         db.collection("user")
@@ -184,9 +190,88 @@ public class ListChatFragment extends Fragment {
                         addChatFragment).commit();
             }
         });
+        searchByName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                db.collection("user")
+                        .document(userSharedPref.getId())
+                        .collection("refToChat")
+                        .orderBy("LastMessageDate", Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots,
+                                        @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w("FirestoreException", "Listen failed.", e);
+                            return;
+                        }
+
+                        List<DocumentSnapshot> documentSnapshots =
+                                queryDocumentSnapshots.getDocuments();
+                        listChatViewModels.clear();
+                        listChatModels.clear();
+                        for (DocumentSnapshot ds :
+                                documentSnapshots) {
+                            Optional<DocumentReference> opDocRef = Optional.fromNullable(
+                                    ds.getDocumentReference("refToChat"));
+                            if (opDocRef.isPresent()) {
+                                DocumentReference dr = opDocRef.get();
+                                final String LastMessage = (String) ds.get("LastMessage");
+                                final Date LastMessageDate =
+                                        ds.getTimestamp("LastMessageDate").toDate();
+                                final long countUnreadMessages = ds.getLong("countUnreadMessages");
+                                tasks.add(dr.get().addOnSuccessListener(
+                                        new OnSuccessListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                ListChatModel listChatModel =
+                                                        documentSnapshot.toObject(
+                                                                ListChatModel.class);
+                                                listChatModels.add(listChatModel);
+                                                if (listChatModel != null) {
+                                                    listChatViewModels.add(
+                                                            new ListChatViewModel(listChatModel.getTitle(),
+                                                                    LastMessage,
+                                                                    listChatModel.getImageChat(),
+                                                                    LastMessageDate,
+                                                                    documentSnapshot.getId(),
+                                                                    countUnreadMessages));
+                                                }
+                                            }
+                                        }));
+                            }
+                        }
+
+                        Tasks.whenAll(tasks).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                listChatAdapter.updateChatListView(sortByNameW(listChatViewModels,searchByName.getText().toString()));
+                                tasks.clear();
+                            }
+                        });
+                    }
+                });
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+
+
         return view;
     }
-
+    private List<ListChatViewModel> sortByNameW(List<ListChatViewModel> toSort, String name) {
+        return toSort.stream()
+                .filter(x -> x.getTitle().toLowerCase().contains(name.toLowerCase()))
+                .collect(Collectors.toList());
+    }
     private void requestPermission() {
         new AlertDialog.Builder(getContext())
                 .setTitle("Potrzebne uprawnienia")
