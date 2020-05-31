@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,7 @@ import com.example.clonemessenger.R;
 import com.example.clonemessenger.SharedPrefUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +54,14 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         holder.userModelWithRef.setPathToDocument(
                 userModelWithRefList.get(position).getPathToDocument());
         holder.userModelWithRef.setUserModel(userModelWithRefList.get(position).getUserModel());
+        if(userModelWithRefList.get(position).getUserModel().isOnline()){
+            holder.online.setVisibility(View.VISIBLE);
+            holder.lastOnline.setText("");
+        } else {
+            holder.online.setVisibility(View.GONE);
+            SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm");
+            holder.lastOnline.setText(ctx.getResources().getString(R.string.lastOnline)+localDateFormat.format(userModelWithRefList.get(position).getUserModel().getLastOnline()));
+        }
     }
 
     @Override
@@ -60,15 +70,17 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-
-        TextView userName;
+        RelativeLayout online;
+        TextView userName, lastOnline;
         CircleImageView imageUser;
         UserModelWithRef userModelWithRef;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             userName = itemView.findViewById(R.id.txname);
+            online= itemView.findViewById(R.id.rOnline);
             imageUser = itemView.findViewById(R.id.imimage);
+            lastOnline= itemView.findViewById(R.id.textView2);
             userModelWithRef = new UserModelWithRef();
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

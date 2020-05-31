@@ -103,47 +103,46 @@ public class ContactFragment extends Fragment {
         db.collection("user")
                 .document(userSharedPref.getId())
                 .collection("contacts")
-                .get()
-                .addOnSuccessListener(
-                        new OnSuccessListener<QuerySnapshot>() {
-                            @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                List<DocumentSnapshot> documentSnapshots =
-                                        queryDocumentSnapshots.getDocuments();
-                                for (DocumentSnapshot ds :
-                                        documentSnapshots) {
-                                    Optional<DocumentReference> optionalDocumentReference =
-                                            Optional.ofNullable(ds.getDocumentReference(
-                                                    "refToUser"));
-                                    DocumentReference dr;
-                                    if (optionalDocumentReference.isPresent()) {
-                                        dr = optionalDocumentReference.get();
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        List<DocumentSnapshot> documentSnapshots =
+                                queryDocumentSnapshots.getDocuments();
+                        userModelWithRefs.clear();
+                        for (DocumentSnapshot ds :
+                                documentSnapshots) {
+                            Optional<DocumentReference> optionalDocumentReference =
+                                    Optional.ofNullable(ds.getDocumentReference(
+                                            "refToUser"));
+                            DocumentReference dr;
+                            if (optionalDocumentReference.isPresent()) {
+                                dr = optionalDocumentReference.get();
 
-                                        tasks.add(dr.get().addOnSuccessListener(
-                                                new OnSuccessListener<DocumentSnapshot>() {
-                                                    @Override
-                                                    public void onSuccess(
-                                                            DocumentSnapshot documentSnapshot) {
-                                                        userModelWithRefs.add(new UserModelWithRef(
-                                                                documentSnapshot.getReference()
-                                                                        .getPath(),
-                                                                documentSnapshot.toObject(UserModel.class)));
-                                                        makeToast((String) ds.get("name"));
-                                                    }
-                                                }));
-                                    }
-                                }
-                                Tasks.whenAll(tasks).addOnSuccessListener(
-                                        new OnSuccessListener<Void>() {
+                                tasks.add(dr.get().addOnSuccessListener(
+                                        new OnSuccessListener<DocumentSnapshot>() {
                                             @Override
-                                            public void onSuccess(Void aVoid) {
-                                                contactsAdapter.updateRecycleView(
-                                                        userModelWithRefs);
-                                                tasks.clear();
+                                            public void onSuccess(
+                                                    DocumentSnapshot documentSnapshot) {
+                                                userModelWithRefs.add(new UserModelWithRef(
+                                                        documentSnapshot.getReference()
+                                                                .getPath(),
+                                                        documentSnapshot.toObject(UserModel.class)));
+                                                makeToast((String) ds.get("name"));
                                             }
-                                        });
+                                        }));
                             }
-                        });
+                        }
+                        Tasks.whenAll(tasks).addOnSuccessListener(
+                                new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        contactsAdapter.updateRecycleView(
+                                                userModelWithRefs);
+                                        tasks.clear();
+                                    }
+                                });
+                    }
+                });
         toAddContactFragment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

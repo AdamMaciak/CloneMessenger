@@ -33,4 +33,5 @@
     <string name="createChat">Stwórz nowy czat</string>
     <string name="addUserToChat">Dodaj użytkowników do czatu</string>
     <string name="addPerson">Dodaj osobe</string>
+    <string name="lastOnline">Ostatnio dostępny: </string>
 </resources>
