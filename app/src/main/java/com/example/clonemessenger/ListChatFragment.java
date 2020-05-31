@@ -134,7 +134,7 @@ public class ListChatFragment extends Fragment {
                                                     new ListChatViewModel(listChatModel.getTitle(),
                                                             LastMessage,
                                                             listChatModel.getImageChat(),
-                                                            LastMessageDate.toString(),
+                                                            LastMessageDate,
                                                             documentSnapshot.getId()));
                                         }
                                     }
