@@ -60,7 +60,7 @@ public class AddChatFragment extends Fragment {
         return v;
     }
 
-    public void addNewChat(String title, String description) {
+    private void addNewChat(String title, String description) {
         ListChatModel listChatModel = new ListChatModel(title, "", false
                 , false, description);
         db.collection("listChat").add(listChatModel).addOnSuccessListener(
@@ -73,6 +73,7 @@ public class AddChatFragment extends Fragment {
                         refToChat.put("LastMessage", "");
                         refToChat.put("LastMessageDate", Calendar.getInstance().getTime());
                         refToChat.put("refToChat", documentReference);
+                        refToChat.put("countUnreadMessages", 0);
                         db.collection("user")
                                 .document(SharedPrefUser.getInstance(ctx).getUser().getId())
                                 .collection(
@@ -90,7 +91,6 @@ public class AddChatFragment extends Fragment {
                                 db.collection("user")
                                         .document(
                                                 SharedPrefUser.getInstance(ctx).getUser().getId());
-
                         toAdd.put("refToUser", drUser);
                         dr.collection("users").add(toAdd).addOnSuccessListener(
                                 new OnSuccessListener<DocumentReference>() {
@@ -99,11 +99,11 @@ public class AddChatFragment extends Fragment {
                                         makeToast("dodano usera do chatu");
                                     }
                                 });
-
                     }
                 });
     }
 
+    //TODO
     private void addChatToUser() {
 
     }

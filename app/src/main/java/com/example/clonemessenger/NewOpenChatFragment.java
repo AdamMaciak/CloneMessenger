@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.clonemessenger.Adapters.ChatAdapter;
 import com.example.clonemessenger.Models.ChatModel;
 import com.example.clonemessenger.ViewModels.ListChatViewModel;
@@ -42,6 +43,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -224,37 +226,7 @@ public class NewOpenChatFragment extends Fragment {
                                         listChatViewModel.getIdChat())
                                 .collection("messages")
                                 .add(chatModel);
-
-                        db.collection("listChat")
-                                .document(listChatViewModel.getIdChat())
-                                .collection("users")
-                                .get()
-                                .addOnSuccessListener(
-                                        new OnSuccessListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onSuccess(
-                                                    QuerySnapshot queryDocumentSnapshots) {
-                                                List<DocumentSnapshot> ds =
-                                                        queryDocumentSnapshots.getDocuments();
-                                                for (DocumentSnapshot d :
-                                                        ds) {
-                                                    ((DocumentReference) d.get(
-                                                            "refToUser")).collection("refToChat")
-                                                            .document(listChatViewModel.getIdChat())
-                                                            .update("LastMessage", message,
-                                                                    "LastMessageDate",
-                                                                    currentTime)
-                                                            .addOnSuccessListener(
-                                                                    new OnSuccessListener<Void>() {
-                                                                        @Override
-                                                                        public void onSuccess(
-                                                                                Void aVoid) {
-
-                                                                        }
-                                                                    });
-                                                }
-                                            }
-                                        });
+                        updateChatLabel(message, currentTime);
                         et_message.setText("");
                     } else if (!message.equals("") && photo == true) {
                         StorageReference riversRef = storage.getReference()
@@ -279,6 +251,7 @@ public class NewOpenChatFragment extends Fragment {
                                         .document(listChatViewModel.getIdChat())
                                         .collection("messages")
                                         .add(chatModel);
+                                updateChatLabel(message, currentTime);
                                 if (!cameraFilePath.equals("")) {
                                     File file = new File(cameraFilePath);
                                     if (file.exists()) {
@@ -319,6 +292,7 @@ public class NewOpenChatFragment extends Fragment {
                                                 listChatViewModel.getIdChat())
                                         .collection("messages")
                                         .add(chatModel);
+                                updateChatLabel(message, currentTime);
                                 if (!cameraFilePath.equals("")) {
                                     File file = new File(cameraFilePath);
                                     if (file.exists()) {
@@ -383,6 +357,7 @@ public class NewOpenChatFragment extends Fragment {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value,
                                         @Nullable FirebaseFirestoreException e) {
+                        updateCountUnreadMessageAfterReading();
                         if (e != null) {
                             Log.w(TAG, "Listen failed.", e);
                             return;
@@ -404,7 +379,49 @@ public class NewOpenChatFragment extends Fragment {
                         mAdapter.notifyItemInserted(chat.size() - 1);
                         linearLayoutManager.scrollToPosition(chat.size() - 1);
                     }
+
                 });
+    }
+
+    private void updateChatLabel(String message, Date currentTime) {
+        db.collection("listChat")
+                .document(listChatViewModel.getIdChat())
+                .collection("users")
+                .get()
+                .addOnSuccessListener(
+                        new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(
+                                    QuerySnapshot queryDocumentSnapshots) {
+                                List<DocumentSnapshot> ds =
+                                        queryDocumentSnapshots.getDocuments();
+                                for (DocumentSnapshot d :
+                                        ds) {
+                                    ((DocumentReference) d.get(
+                                            "refToUser")).collection("refToChat")
+                                            .document(listChatViewModel.getIdChat())
+                                            .update("LastMessage", message,
+                                                    "LastMessageDate",
+                                                    currentTime, "countUnreadMessages",
+                                                    FieldValue.increment(1))
+                                            .addOnSuccessListener(
+                                                    new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(
+                                                                Void aVoid) {
+
+                                                        }
+                                                    });
+                                }
+                            }
+                        });
+    }
+
+    private void updateCountUnreadMessageAfterReading() {
+        db.collection("user")
+                .document(SharedPrefUser.getInstance(getContext()).getUser().getId()).collection(
+                "refToChat").document(listChatViewModel.getIdChat())
+                .update("countUnreadMessages", 0);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
