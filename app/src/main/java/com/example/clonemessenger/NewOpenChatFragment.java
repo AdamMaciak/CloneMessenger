@@ -151,7 +151,7 @@ public class NewOpenChatFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_new_open_chat, container, false);
         recyclerView = root.findViewById(R.id.rvChat);
         recyclerView.setHasFixedSize(true);
-        chatImage=(CircleImageView) root.findViewById(R.id.chatPhoto);
+        chatImage = (CircleImageView) root.findViewById(R.id.chatPhoto);
         final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
 //        System.out.println(account.getPhotoUrl());
         linearLayoutManager = new LinearLayoutManager(getContext());
@@ -210,10 +210,10 @@ public class NewOpenChatFragment extends Fragment {
         et_message = root.findViewById(R.id.et_message);
         fUser = FirebaseAuth.getInstance().getCurrentUser();
         userId = fUser.getUid();
-        chatName= (TextView) root.findViewById(R.id.txChatName);
+        chatName = (TextView) root.findViewById(R.id.txChatName);
         Bundle bundle = this.getArguments();
-        if(bundle != null){
-            String title=bundle.getString("title");
+        if (bundle != null) {
+            String title = bundle.getString("title");
             chatName.setText(title);
             //Glide.with(getContext()).load(bundle.getString("photo")).into(chatImage);
 
@@ -413,21 +413,26 @@ public class NewOpenChatFragment extends Fragment {
                                         queryDocumentSnapshots.getDocuments();
                                 for (DocumentSnapshot d :
                                         ds) {
-                                    ((DocumentReference) d.get(
-                                            "refToUser")).collection("refToChat")
-                                            .document(listChatViewModel.getIdChat())
-                                            .update("LastMessage", message,
-                                                    "LastMessageDate",
-                                                    currentTime, "countUnreadMessages",
-                                                    FieldValue.increment(1))
-                                            .addOnSuccessListener(
-                                                    new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(
-                                                                Void aVoid) {
+                                    if (((DocumentReference) d.get("refToUser")).getId()
+                                            .equals(SharedPrefUser.getInstance(getContext())
+                                                    .getUser()
+                                                    .getId())) {
+                                        ((DocumentReference) d.get(
+                                                "refToUser")).collection("refToChat")
+                                                .document(listChatViewModel.getIdChat())
+                                                .update("LastMessage", message,
+                                                        "LastMessageDate",
+                                                        currentTime, "countUnreadMessages",
+                                                        FieldValue.increment(1))
+                                                .addOnSuccessListener(
+                                                        new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(
+                                                                    Void aVoid) {
 
-                                                        }
-                                                    });
+                                                            }
+                                                        });
+                                    }
                                 }
                             }
                         });

@@ -49,7 +49,7 @@ public class AddChatFragment extends Fragment {
     AddContactToChat addContactToChat;
     byte[] compressedBitmap;
     String photoUrl;
-    int GALLERY_REQUEST_CODE=1;
+    int GALLERY_REQUEST_CODE = 1;
     String filename;
     FirebaseStorage storage;
 
@@ -66,10 +66,12 @@ public class AddChatFragment extends Fragment {
         chatNameEditText = v.findViewById(R.id.chatName);
         descriptionEditText = v.findViewById(R.id.descriptionChat);
         buttonAddChatFragment = v.findViewById(R.id.addChat);
-        imageView= (ImageView) v.findViewById(R.id.chatPhoto);
-        UserSharedPref userSharedPref=SharedPrefUser.getInstance(getContext()).getUser();
-        Glide.with(getContext()).load(Uri.parse(userSharedPref.getImageCompressPath())).into(imageView);
-        photoUrl=userSharedPref.getImageCompressPath();
+        imageView = (ImageView) v.findViewById(R.id.chatPhoto);
+        UserSharedPref userSharedPref = SharedPrefUser.getInstance(getContext()).getUser();
+        Glide.with(getContext())
+                .load(Uri.parse(userSharedPref.getImageCompressPath()))
+                .into(imageView);
+        photoUrl = userSharedPref.getImageCompressPath();
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,18 +101,23 @@ public class AddChatFragment extends Fragment {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         StorageReference riversRef2 = storage.getReference();
-                        riversRef2.child("chatPhoto/"+filename).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                progressDialog.dismiss();
-                                addNewChat(chatNameEditText.getText().toString(),
-                                        descriptionEditText.getText().toString(),uri.toString());
-                                addChatToUser();
-                                addContactToChat = new AddContactToChat();
-                                getParentFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
-                                        addContactToChat).commit();
-                            }
-                        });
+                        riversRef2.child("chatPhoto/" + filename)
+                                .getDownloadUrl()
+                                .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        progressDialog.dismiss();
+                                        addNewChat(chatNameEditText.getText().toString(),
+                                                descriptionEditText.getText().toString(),
+                                                uri.toString());
+                                        addChatToUser();
+                                        addContactToChat = new AddContactToChat();
+                                        getParentFragmentManager().beginTransaction()
+                                                .replace(R.id.fragmentContainer,
+                                                        addContactToChat)
+                                                .commit();
+                                    }
+                                });
                     }
                 });
 
@@ -124,18 +131,20 @@ public class AddChatFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if(resultCode == Activity.RESULT_OK || requestCode==GALLERY_REQUEST_CODE){
+        if ((resultCode == Activity.RESULT_OK || requestCode == GALLERY_REQUEST_CODE) && data != null) {
             Uri selectedImage = data.getData();
             Uri filePath = Uri.fromFile(new File(getRealPathFromURI(selectedImage)));
             filename = filePath.getLastPathSegment();
             Uri imageUri = data.getData();
             Bitmap bitmap = null;
             try {
-                bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), imageUri);
+                bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(),
+                        imageUri);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 60, baos);
                 compressedBitmap = baos.toByteArray();
-                Bitmap bmp = BitmapFactory.decodeByteArray(compressedBitmap, 0, compressedBitmap.length);
+                Bitmap bmp = BitmapFactory.decodeByteArray(compressedBitmap, 0,
+                        compressedBitmap.length);
                 imageView.setImageBitmap(Bitmap.createScaledBitmap(bmp, imageView.getWidth(),
                         imageView.getHeight(), false));
             } catch (IOException e) {
@@ -146,7 +155,7 @@ public class AddChatFragment extends Fragment {
 
     }
 
-    private void addNewChat(String title, String description,String photoUrl) {
+    private void addNewChat(String title, String description, String photoUrl) {
         ListChatModel listChatModel = new ListChatModel(title, photoUrl, false
                 , false, description);
         db.collection("listChat").add(listChatModel).addOnSuccessListener(

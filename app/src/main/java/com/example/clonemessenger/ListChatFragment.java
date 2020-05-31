@@ -38,10 +38,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class ListChatFragment extends Fragment {
@@ -100,58 +102,62 @@ public class ListChatFragment extends Fragment {
         db.collection("user")
                 .document(userSharedPref.getId())
                 .collection("refToChat")
-                .orderBy("LastMessageDate", Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots,
-                                @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w("FirestoreException", "Listen failed.", e);
-                    return;
-                }
-
-                List<DocumentSnapshot> documentSnapshots =
-                        queryDocumentSnapshots.getDocuments();
-                listChatViewModels.clear();
-                listChatModels.clear();
-                for (DocumentSnapshot ds :
-                        documentSnapshots) {
-                    Optional<DocumentReference> opDocRef = Optional.fromNullable(
-                            ds.getDocumentReference("refToChat"));
-                    if (opDocRef.isPresent()) {
-                        DocumentReference dr = opDocRef.get();
-                        final String LastMessage = (String) ds.get("LastMessage");
-                        final Date LastMessageDate =
-                                ds.getTimestamp("LastMessageDate").toDate();
-                        final long countUnreadMessages = ds.getLong("countUnreadMessages");
-                        tasks.add(dr.get().addOnSuccessListener(
-                                new OnSuccessListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                        ListChatModel listChatModel =
-                                                documentSnapshot.toObject(
-                                                        ListChatModel.class);
-                                        listChatModels.add(listChatModel);
-                                        if (listChatModel != null) {
-                                            listChatViewModels.add(
-                                                    new ListChatViewModel(listChatModel.getTitle(),
-                                                            LastMessage,
-                                                            listChatModel.getImageChat(),
-                                                            LastMessageDate,
-                                                            documentSnapshot.getId(),
-                                                            countUnreadMessages));
-                                        }
-                                    }
-                                }));
-                    }
-                }
-
-                Tasks.whenAll(tasks).addOnSuccessListener(new OnSuccessListener<Void>() {
+                .orderBy("LastMessageDate", Query.Direction.DESCENDING)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        listChatAdapter.updateChatListView(listChatViewModels);
-                        tasks.clear();
-                    }
-                });
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots,
+                                        @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w("FirestoreException", "Listen failed.", e);
+                            return;
+                        }
+
+                        List<DocumentSnapshot> documentSnapshots =
+                                queryDocumentSnapshots.getDocuments();
+                        listChatViewModels.clear();
+                        listChatModels.clear();
+                        for (DocumentSnapshot ds :
+                                documentSnapshots) {
+                            Optional<DocumentReference> opDocRef = Optional.fromNullable(
+                                    ds.getDocumentReference("refToChat"));
+                            if (opDocRef.isPresent()) {
+                                DocumentReference dr = opDocRef.get();
+                                final String LastMessage = (String) ds.get("LastMessage");
+                                final Date LastMessageDate =
+                                        ds.getTimestamp("LastMessageDate").toDate();
+                                final long countUnreadMessages = ds.getLong("countUnreadMessages");
+                                tasks.add(dr.get().addOnSuccessListener(
+                                        new OnSuccessListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onSuccess(
+                                                    DocumentSnapshot documentSnapshot) {
+                                                ListChatModel listChatModel =
+                                                        documentSnapshot.toObject(
+                                                                ListChatModel.class);
+                                                listChatModels.add(listChatModel);
+                                                if (listChatModel != null) {
+                                                    listChatViewModels.add(
+                                                            new ListChatViewModel(
+                                                                    listChatModel.getTitle(),
+                                                                    LastMessage,
+                                                                    listChatModel.getImageChat(),
+                                                                    LastMessageDate,
+                                                                    documentSnapshot.getId(),
+                                                                    countUnreadMessages));
+                                                }
+                                            }
+                                        }));
+                            }
+                        }
+
+                        Tasks.whenAll(tasks).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                listChatAdapter.updateChatListView(
+                                        sortMessagesByDate(listChatViewModels));
+                                tasks.clear();
+                            }
+                        });
 //                Tasks.whenAllSuccess(tasks).addOnSuccessListener(
 //                        new OnSuccessListener<List<Object>>() {
 //                            @Override
@@ -172,8 +178,8 @@ public class ListChatFragment extends Fragment {
 //                                tasks.clear();
 //                            }
 //                        });
-            }
-        });
+                    }
+                });
         toAddChatFragment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -183,6 +189,13 @@ public class ListChatFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    private List<ListChatViewModel> sortMessagesByDate(List<ListChatViewModel> listChatViewModels) {
+        return listChatViewModels.stream()
+                .sorted(Comparator.comparing(ListChatViewModel::getLastMessageDate).reversed())
+                .collect(
+                        Collectors.toList());
     }
 
     private void requestPermission() {
