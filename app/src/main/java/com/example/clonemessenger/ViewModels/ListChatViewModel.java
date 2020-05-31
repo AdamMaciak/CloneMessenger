@@ -4,16 +4,24 @@ import androidx.annotation.NonNull;
 
 import java.util.Date;
 
-public class ListChatViewModel{
+public class ListChatViewModel {
 
     private String title;
     private String lastMessage;
     private String imageChatPath;
     private Date lastMessageDate;
     private String idChat;
+    private long countUnreadMessages;
 
-    public
-    ListChatViewModel() {
+    public long getCountUnreadMessages() {
+        return countUnreadMessages;
+    }
+
+    public void setCountUnreadMessages(long countUnreadMessages) {
+        this.countUnreadMessages = countUnreadMessages;
+    }
+
+    public ListChatViewModel() {
     }
 
     @NonNull
@@ -23,12 +31,13 @@ public class ListChatViewModel{
     }
 
     public ListChatViewModel(String title, String lastMessage, String imageChatPath,
-                             Date lastMessageDate, String idChat) {
+                             Date lastMessageDate, String idChat, long countUnreadMessages) {
         this.title = title;
         this.lastMessage = lastMessage;
         this.imageChatPath = imageChatPath;
         this.lastMessageDate = lastMessageDate;
         this.idChat = idChat;
+        this.countUnreadMessages = countUnreadMessages;
     }
 
     public String getTitle() {
