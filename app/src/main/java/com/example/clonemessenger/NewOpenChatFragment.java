@@ -168,6 +168,7 @@ public class NewOpenChatFragment extends Fragment {
                 getParentFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
                         new ListChatFragment()).commit();
                 ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+                MainActivity.bottomBar.setVisibility(View.VISIBLE);
             }
         });
 
