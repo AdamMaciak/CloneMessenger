@@ -3,6 +3,8 @@ package com.example.clonemessenger;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.fonts.FontFamily;
+import android.graphics.fonts.FontStyle;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
    @Override
     protected void onCreate(Bundle savedInstanceState) {
        super.onCreate(savedInstanceState);
+
        firstRun = new FirstRun();
        SharedPreferences preferences=getSharedPreferences("Settings",MODE_PRIVATE);
        boolean fStart=preferences.getBoolean("firstStart",true);

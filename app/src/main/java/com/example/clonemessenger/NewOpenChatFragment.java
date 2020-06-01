@@ -180,7 +180,7 @@ public class NewOpenChatFragment extends Fragment {
         userImagesWithFile = new ConcurrentHashMap<>();
         isDownloadedImage = false;
         isDownloadPath = false;
-        numberOfImage=0;
+        numberOfImage = 0;
         View root = inflater.inflate(R.layout.fragment_new_open_chat, container, false);
         buttonBack = root.findViewById(R.id.imageView);
         recyclerView = root.findViewById(R.id.rvChat);
@@ -585,15 +585,15 @@ public class NewOpenChatFragment extends Fragment {
                                             d.getDocumentReference("refToUser");
                                     assert dr != null;
                                     tasksToImages.add(dr.get().addOnSuccessListener(
-                                                new OnSuccessListener<DocumentSnapshot>() {
-                                                    @Override
-                                                    public void onSuccess(
-                                                            DocumentSnapshot documentSnapshot) {
-                                                        userImages.put(dr.getId(),
-                                                                (String) documentSnapshot.get(
-                                                                        "imageCompressPath"));
-                                                    }
-                                                }));
+                                            new OnSuccessListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onSuccess(
+                                                        DocumentSnapshot documentSnapshot) {
+                                                    userImages.put(dr.getId(),
+                                                            (String) documentSnapshot.get(
+                                                                    "imageCompressPath"));
+                                                }
+                                            }));
                                 }
                                 Tasks.whenAll(tasksToImages).addOnSuccessListener(
                                         new OnSuccessListener<Void>() {
@@ -607,28 +607,29 @@ public class NewOpenChatFragment extends Fragment {
     }
 
     private void downloadImageProfiles() throws ExecutionException, InterruptedException {
-        for (Map.Entry me:
-             userImages.entrySet()) {
-          Bitmap bitmap=Glide.with(getContext()).asBitmap().load(me.getValue()).addListener(
-                  new RequestListener<Bitmap>() {
-                      @Override
-                      public boolean onLoadFailed(@Nullable GlideException e, Object model,
-                                                  Target<Bitmap> target, boolean isFirstResource) {
-                          return false;
-                      }
+        for (Map.Entry me :
+                userImages.entrySet()) {
+            Bitmap bitmap = Glide.with(getContext()).asBitmap().load(me.getValue()).addListener(
+                    new RequestListener<Bitmap>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model,
+                                                    Target<Bitmap> target,
+                                                    boolean isFirstResource) {
+                            return false;
+                        }
 
-                      @Override
-                      public boolean onResourceReady(Bitmap resource, Object model,
-                                                     Target<Bitmap> target, DataSource dataSource,
-                                                     boolean isFirstResource) {
-                          numberOfImage++;
-                          if(numberOfImage==userImages.size()){
-                              isDownloadedImage=true;
-                          }
-                          return false;
-                      }
-                  }).submit().get();
-          userImagesWithFile.put((String)me.getKey(),bitmap);
+                        @Override
+                        public boolean onResourceReady(Bitmap resource, Object model,
+                                                       Target<Bitmap> target, DataSource dataSource,
+                                                       boolean isFirstResource) {
+                            numberOfImage++;
+                            if (numberOfImage == userImages.size()) {
+                                isDownloadedImage = true;
+                            }
+                            return false;
+                        }
+                    }).submit().get();
+            userImagesWithFile.put((String) me.getKey(), bitmap);
         }
 
     }

@@ -94,7 +94,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         if (!chat.getMessage().equals("")) {
             holder.show_message.setVisibility(View.VISIBLE);
             holder.show_message.setText(chat.getMessage());
-        }if(!mChat.get(position).getSender().equals(SharedPrefUser.getInstance(mContext).getUser().getId())){
+        }
+        if (!mChat.get(position)
+                .getSender()
+                .equals(SharedPrefUser.getInstance(mContext).getUser().getId())) {
             holder.profile_image.setImageBitmap(userImages.get(mChat.get(position).getSender()));
         }
         SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm");
