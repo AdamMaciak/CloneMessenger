@@ -68,14 +68,15 @@ public class AddChatFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_add_chat, container, false);
-        checked=false;
-        SharedPreferences preferences=getActivity().getSharedPreferences("Settings",MODE_PRIVATE);
-        String language= preferences.getString("Lang","");
-        Locale locale=new Locale(language);
+        checked = false;
+        SharedPreferences preferences = getActivity().getSharedPreferences("Settings",
+                MODE_PRIVATE);
+        String language = preferences.getString("Lang", "");
+        Locale locale = new Locale(language);
         Locale.setDefault(locale);
-        Configuration configuration=new Configuration();
-        configuration.locale=locale;
-        getResources().updateConfiguration(configuration,getResources().getDisplayMetrics());
+        Configuration configuration = new Configuration();
+        configuration.locale = locale;
+        getResources().updateConfiguration(configuration, getResources().getDisplayMetrics());
         getActivity().setTitle(getResources().getString(R.string.createChat));
         storage = FirebaseStorage.getInstance();
         chatNameEditText = v.findViewById(R.id.chatName);
@@ -105,7 +106,7 @@ public class AddChatFragment extends Fragment {
         buttonAddChatFragment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(checked==true) {
+                if (checked == true) {
                     final ProgressDialog progressDialog
                             = new ProgressDialog(getContext());
                     progressDialog.setMessage(getResources().getString(R.string.uploadPhoto));
@@ -113,29 +114,32 @@ public class AddChatFragment extends Fragment {
                     StorageReference riversRef = storage.getReference()
                             .child("chatPhoto/" + filename);
                     UploadTask uploadTask = riversRef.putBytes(compressedBitmap);
-                    uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            StorageReference riversRef2 = storage.getReference();
-                            riversRef2.child("chatPhoto/" + filename)
-                                    .getDownloadUrl()
-                                    .addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                        @Override
-                                        public void onSuccess(Uri uri) {
-                                            progressDialog.dismiss();
-                                            addNewChat(chatNameEditText.getText().toString(),
-                                                    descriptionEditText.getText().toString(),
-                                                    uri.toString());
-                                            addChatToUser();
-                                            addContactToChat = new AddContactToChat();
-                                            getParentFragmentManager().beginTransaction()
-                                                    .replace(R.id.fragmentContainer,
-                                                            addContactToChat)
-                                                    .commit();
-                                        }
-                                    });
-                        }
-                    });
+                    uploadTask.addOnSuccessListener(
+                            new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    StorageReference riversRef2 = storage.getReference();
+                                    riversRef2.child("chatPhoto/" + filename)
+                                            .getDownloadUrl()
+                                            .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                @Override
+                                                public void onSuccess(Uri uri) {
+                                                    progressDialog.dismiss();
+                                                    addNewChat(
+                                                            chatNameEditText.getText().toString(),
+                                                            descriptionEditText.getText()
+                                                                    .toString(),
+                                                            uri.toString());
+                                                    addChatToUser();
+                                                    addContactToChat = new AddContactToChat();
+                                                    getParentFragmentManager().beginTransaction()
+                                                            .replace(R.id.fragmentContainer,
+                                                                    addContactToChat)
+                                                            .commit();
+                                                }
+                                            });
+                                }
+                            });
                 } else {
                     addNewChat(chatNameEditText.getText().toString(),
                             descriptionEditText.getText().toString(),
@@ -159,7 +163,7 @@ public class AddChatFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if ((resultCode == Activity.RESULT_OK || requestCode == GALLERY_REQUEST_CODE) && data != null) {
-            checked=true;
+            checked = true;
             Uri selectedImage = data.getData();
             Uri filePath = Uri.fromFile(new File(getRealPathFromURI(selectedImage)));
             filename = filePath.getLastPathSegment();

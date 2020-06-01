@@ -205,6 +205,7 @@ public class AddContactToChat extends Fragment implements AddContactToChatAdapte
             toAdd.put("LastMessage", "");
             toAdd.put("LastMessageDate", Calendar.getInstance().getTime());
             toAdd.put("refToChat", db.document("listChat/" + idChatCreated));
+            toAdd.put("countUnreadMessages", 0);
             dr.collection("refToChat")
                     .document(idChatCreated.trim())
                     .set(toAdd)

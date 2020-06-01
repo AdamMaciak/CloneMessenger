@@ -1,6 +1,8 @@
 package com.example.clonemessenger.Adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,15 +17,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.clonemessenger.Models.ChatModel;
 import com.example.clonemessenger.R;
+import com.example.clonemessenger.SharedPrefUser;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import io.opencensus.internal.Utils;
 
 import static android.widget.Toast.LENGTH_SHORT;
@@ -33,14 +41,15 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     public static final int msg_right = 1;
     private Context mContext;
     private List<ChatModel> mChat;
-    private Uri profilePhotoUrl;
     FirebaseUser fUser;
     FirebaseStorage storage = FirebaseStorage.getInstance();
 
-    public ChatAdapter(Context mContext, List<ChatModel> mChat, Uri profilePhotoUrl) {
+    private ConcurrentHashMap<String, Bitmap> userImages;
+
+    public ChatAdapter(Context mContext, List<ChatModel> mChat, ConcurrentHashMap userImages) {
         this.mChat = mChat;
         this.mContext = mContext;
-        this.profilePhotoUrl = profilePhotoUrl;
+        this.userImages = userImages;
         fUser = FirebaseAuth.getInstance().getCurrentUser();
     }
 
@@ -85,10 +94,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         if (!chat.getMessage().equals("")) {
             holder.show_message.setVisibility(View.VISIBLE);
             holder.show_message.setText(chat.getMessage());
+        }if(!mChat.get(position).getSender().equals(SharedPrefUser.getInstance(mContext).getUser().getId())){
+            holder.profile_image.setImageBitmap(userImages.get(mChat.get(position).getSender()));
         }
         SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm");
         holder.time.setText(localDateFormat.format(chat.getTimeSend()));
     }
+
     @Override
     public long getItemId(int position) {
         return position;
@@ -127,4 +139,5 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     public int getItemViewType(int position) {
         return position;
     }
+
 }

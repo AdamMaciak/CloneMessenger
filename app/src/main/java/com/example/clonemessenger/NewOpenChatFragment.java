@@ -3,6 +3,7 @@ package com.example.clonemessenger;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -28,6 +29,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.clonemessenger.Adapters.ChatAdapter;
 import com.example.clonemessenger.Models.ChatModel;
 import com.example.clonemessenger.ViewModels.ListChatViewModel;
@@ -41,6 +46,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.common.base.Optional;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -49,11 +57,14 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import org.w3c.dom.Document;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,7 +72,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -93,6 +109,14 @@ public class NewOpenChatFragment extends Fragment {
     private ListChatViewModel listChatViewModel;
 
     private String cameraFilePath = "";
+
+    private ConcurrentHashMap<String, String> userImages;
+    private List<Task<DocumentSnapshot>> tasksToImages;
+    private boolean isDownloadPath;
+    private boolean isDownloadedImage;
+    private int numberOfImage;
+    private ConcurrentHashMap<String, Bitmap> userImagesWithFile;
+
 
     public void setListChatViewModel(
             ListChatViewModel listChatViewModel) {
@@ -151,7 +175,12 @@ public class NewOpenChatFragment extends Fragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         // Inflate the layout for this fragment
         chat.clear();
-
+        userImages = new ConcurrentHashMap<>();
+        tasksToImages = new ArrayList<>();
+        userImagesWithFile = new ConcurrentHashMap<>();
+        isDownloadedImage = false;
+        isDownloadPath = false;
+        numberOfImage=0;
         View root = inflater.inflate(R.layout.fragment_new_open_chat, container, false);
         buttonBack = root.findViewById(R.id.imageView);
         recyclerView = root.findViewById(R.id.rvChat);
@@ -233,7 +262,40 @@ public class NewOpenChatFragment extends Fragment {
 
         storage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();
-        getDataFromFirestore();
+
+        getImagesProfiles();
+        Thread checkIsPathDownloaded = new Thread() {
+            @Override
+            public void run() {
+                while (true) {
+                    if (isDownloadPath) {
+                        try {
+                            downloadImageProfiles();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    }
+                }
+            }
+        };
+
+        Thread checkIsDownloaded = new Thread() {
+            @Override
+            public void run() {
+                while (true) {
+                    if (isDownloadedImage) {
+                        getDataFromFirestore();
+                        break;
+                    }
+                }
+            }
+        };
+
+        checkIsPathDownloaded.start();
+        checkIsDownloaded.start();
 
         btn_sendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -372,7 +434,6 @@ public class NewOpenChatFragment extends Fragment {
                 captureFromCamera();
             }
         });
-
         return root;
     }
 
@@ -402,7 +463,7 @@ public class NewOpenChatFragment extends Fragment {
                         }
                         //System.out.println(account.getPhotoUrl());
 //                        mAdapter = new ChatAdapter(getContext(), chat, account.getPhotoUrl());
-                        mAdapter = new ChatAdapter(getContext(), chat, null);
+                        mAdapter = new ChatAdapter(getContext(), chat, userImagesWithFile);
                         recyclerView.setAdapter(mAdapter);
                         mAdapter.notifyItemInserted(chat.size() - 1);
                         linearLayoutManager.scrollToPosition(chat.size() - 1);
@@ -508,4 +569,67 @@ public class NewOpenChatFragment extends Fragment {
         return result;
     }
 
+    private void getImagesProfiles() {
+        db.collection("listChat")
+                .document(listChatViewModel.getIdChat())
+                .collection("users")
+                .get()
+                .addOnSuccessListener(
+                        new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                List<DocumentSnapshot> ds = queryDocumentSnapshots.getDocuments();
+                                for (DocumentSnapshot d :
+                                        ds) {
+                                    DocumentReference dr =
+                                            d.getDocumentReference("refToUser");
+                                    assert dr != null;
+                                    tasksToImages.add(dr.get().addOnSuccessListener(
+                                                new OnSuccessListener<DocumentSnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(
+                                                            DocumentSnapshot documentSnapshot) {
+                                                        userImages.put(dr.getId(),
+                                                                (String) documentSnapshot.get(
+                                                                        "imageCompressPath"));
+                                                    }
+                                                }));
+                                }
+                                Tasks.whenAll(tasksToImages).addOnSuccessListener(
+                                        new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                isDownloadPath = true;
+                                            }
+                                        });
+                            }
+                        });
+    }
+
+    private void downloadImageProfiles() throws ExecutionException, InterruptedException {
+        for (Map.Entry me:
+             userImages.entrySet()) {
+          Bitmap bitmap=Glide.with(getContext()).asBitmap().load(me.getValue()).addListener(
+                  new RequestListener<Bitmap>() {
+                      @Override
+                      public boolean onLoadFailed(@Nullable GlideException e, Object model,
+                                                  Target<Bitmap> target, boolean isFirstResource) {
+                          return false;
+                      }
+
+                      @Override
+                      public boolean onResourceReady(Bitmap resource, Object model,
+                                                     Target<Bitmap> target, DataSource dataSource,
+                                                     boolean isFirstResource) {
+                          numberOfImage++;
+                          if(numberOfImage==userImages.size()){
+                              isDownloadedImage=true;
+                          }
+                          return false;
+                      }
+                  }).submit().get();
+          userImagesWithFile.put((String)me.getKey(),bitmap);
+        }
+
+    }
 }

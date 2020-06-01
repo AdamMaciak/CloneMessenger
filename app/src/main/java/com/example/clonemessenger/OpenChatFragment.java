@@ -341,7 +341,7 @@ public class OpenChatFragment extends Fragment {
                         }
                         //System.out.println(account.getPhotoUrl());
 //                        mAdapter = new ChatAdapter(getContext(), chat, account.getPhotoUrl());
-                        mAdapter = new ChatAdapter(getContext(), chat1, null);
+                        mAdapter = new ChatAdapter(getContext(), chat1,null);
                         recyclerView.setAdapter(mAdapter);
                     }
                 });
