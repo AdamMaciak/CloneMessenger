@@ -15,4 +15,7 @@ Android app created as project to pass classes.
 
 ## screenshots
 
-![](https://github.com/AdamMaciak/my-github-images/blob/main/1.png)
+![1](https://github.com/AdamMaciak/my-github-images/blob/main/1.png)
+![2](https://github.com/AdamMaciak/my-github-images/blob/main/2.png)
+![3](https://github.com/AdamMaciak/my-github-images/blob/main/3.png)
+![4](https://github.com/AdamMaciak/my-github-images/blob/main/4.png)
